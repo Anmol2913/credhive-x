@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Debug Tool - CredHiveX</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: system-ui, -apple-system, sans-serif; 
+      padding: 20px; 
+      background: #f5f5f5;
+      color: #333;
+    }
+    .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    h1 { color: #3b82f6; margin-bottom: 10px; }
+    .subtitle { color: #64748b; margin-bottom: 30px; }
+    .section { margin-bottom: 30px; padding: 20px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #3b82f6; }
+    h2 { color: #1e293b; margin-bottom: 15px; font-size: 18px; }
+    .info { padding: 10px 15px; background: #e0f2fe; border-radius: 6px; margin: 10px 0; font-family: monospace; font-size: 13px; }
+    .success { background: #dcfce7; border-left: 3px solid #22c55e; }
+    .error { background: #fee2e2; border-left: 3px solid #ef4444; }
+    .warning { background: #fef3c7; border-left: 3px solid #f59e0b; }
+    button { 
+      background: #3b82f6; 
+      color: white; 
+      border: none; 
+      padding: 12px 24px; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-weight: 600;
+      margin: 5px 5px 5px 0;
+      transition: all 0.2s;
+    }
+    button:hover { background: #2563eb; transform: translateY(-1px); }
+    button.secondary { background: #64748b; }
+    button.secondary:hover { background: #475569; }
+    pre { 
+      background: #1e293b; 
+      color: #e2e8f0; 
+      padding: 15px; 
+      border-radius: 6px; 
+      overflow-x: auto; 
+      font-size: 12px;
+      margin: 10px 0;
+    }
+    .status-badge { 
+      display: inline-block; 
+      padding: 4px 12px; 
+      border-radius: 12px; 
+      font-size: 12px; 
+      font-weight: 600;
+      margin-left: 10px;
+    }
+    .badge-success { background: #dcfce7; color: #166534; }
+    .badge-error { background: #fee2e2; color: #991b1b; }
+    .badge-warning { background: #fef3c7; color: #92400e; }
+    code { background: #e2e8f0; padding: 2px 6px; border-radius: 3px; font-size: 13px; color: #1e293b; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 API Connection Debugger</h1>
+    <p class="subtitle">Diagnose backend connectivity issues for CredHiveX</p>
+
+    <!-- Backend Status -->
+    <div class="section">
+      <h2>1️⃣ Backend Server Status</h2>
+      <button onclick="checkBackendPorts()">Check All Ports</button>
+      <button onclick="testBackendHealth()" class="secondary">Test Health Endpoint</button>
+      <div id="backendStatus"></div>
+    </div>
+
+    <!-- CORS Test -->
+    <div class="section">
+      <h2>2️⃣ CORS Configuration</h2>
+      <button onclick="testCORS()">Test CORS</button>
+      <div id="corsStatus"></div>
+    </div>
+
+    <!-- Firebase Auth -->
+    <div class="section">
+      <h2>3️⃣ Firebase Authentication</h2>
+      <button onclick="checkFirebaseAuth()">Check Auth Status</button>
+      <button onclick="checkIdToken()" class="secondary">Get ID Token</button>
+      <div id="authStatus"></div>
+    </div>
+
+    <!-- API Base URL -->
+    <div class="section">
+      <h2>4️⃣ API Base URL Configuration</h2>
+      <p style="margin-bottom: 10px; color: #64748b;">Current URL: <code id="currentUrl">Loading...</code></p>
+      <button onclick="testCustomUrl()">Update Base URL</button>
+      <div id="urlStatus"></div>
+      <div class="info warning" style="margin-top: 15px;">
+        <strong>💡 How to change API URL:</strong><br>
+        In browser console, run: <code>window.API.setBaseUrl('http://localhost:YOUR_PORT')</code>
+      </div>
+    </div>
+
+    <!-- API Test -->
+    <div class="section">
+      <h2>5️⃣ Test API Endpoints</h2>
+      <button onclick="testPlansEndpoint()">Test /api/plans</button>
+      <button onclick="testHealthEndpoint()" class="secondary">Test /api/health</button>
+      <div id="apiTest"></div>
+    </div>
+
+    <!-- Console Commands -->
+    <div class="section">
+      <h2>📋 Useful Console Commands</h2>
+      <pre>// Check current API URL
+console.log(window.API.baseUrl());
+
+// Change API URL to port 5000
+window.API.setBaseUrl('http://localhost:5000');
+
+// Test plans API
+window.API.plans().then(console.log).catch(console.error);
+
+// Check Firebase auth
+console.log('Auth:', window.auth?.currentUser);
+
+// Get ID token
+window.auth?.currentUser?.getIdToken().then(console.log);</pre>
+    </div>
+  </div>
+
+  <script src="api-client.js"></script>
+  <script>
+    // Update current URL display
+    setTimeout(() => {
+      document.getElementById('currentUrl').textContent = window.API.baseUrl();
+    }, 100);
+
+    async function checkBackendPorts() {
+      const output = document.getElementById('backendStatus');
+      output.innerHTML = '<p>🔄 Checking ports...</p>';
+      
+      const ports = [3000, 4000, 5000, 8000, 8080];
+      let results = '<h3>Port Scan Results:</h3>';
+      
+      for (const port of ports) {
+        try {
+          const res = await fetch(`http://localhost:${port}/`, { 
+            method: 'GET',
+            mode: 'cors'
+          });
+          results += `<div class="info success">✅ Port ${port}: <strong>Active</strong> - ${await res.text().then(t => t.substring(0, 50))}</div>`;
+        } catch (err) {
+          results += `<div class="info error">❌ Port ${port}: Not responding - ${err.message}</div>`;
+        }
+      }
+      output.innerHTML = results;
+    }
+
+    async function testBackendHealth() {
+      const output = document.getElementById('backendStatus');
+      output.innerHTML = '<p>🔄 Testing health endpoint...</p>';
+      
+      try {
+        const baseUrl = window.API.baseUrl();
+        const res = await fetch(`${baseUrl}/api/health`);
+        const data = await res.json();
+        
+        output.innerHTML = `
+          <div class="info success">
+            <strong>✅ Backend is online!</strong><br>
+            URL: <code>${baseUrl}</code><br>
+            Status: ${data.status}<br>
+            Time: ${data.time}
+          </div>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+        `;
+      } catch (err) {
+        output.innerHTML = `
+          <div class="info error">
+            <strong>❌ Backend connection failed</strong><br>
+            Error: ${err.message}
+          </div>
+        `;
+      }
+    }
+
+    async function testCORS() {
+      const output = document.getElementById('corsStatus');
+      output.innerHTML = '<p>🔄 Testing CORS...</p>';
+      
+      try {
+        const baseUrl = window.API.baseUrl();
+        const res = await fetch(`${baseUrl}/api/plans`, {
+          method: 'GET',
+          mode: 'cors',
+          credentials: 'include'
+        });
+        
+        const corsHeader = res.headers.get('Access-Control-Allow-Origin');
+        
+        if (res.ok) {
+          output.innerHTML = `
+            <div class="info success">
+              <strong>✅ CORS is properly configured!</strong><br>
+              Allow-Origin: <code>${corsHeader || 'Not set'}</code><br>
+              Current Origin: <code>${window.location.origin}</code><br>
+              Status: ${res.status} ${res.statusText}
+            </div>
+          `;
+        } else {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+      } catch (err) {
+        output.innerHTML = `
+          <div class="info error">
+            <strong>❌ CORS Error</strong><br>
+            ${err.message}<br><br>
+            <strong>Solution:</strong> Your backend needs to allow requests from <code>${window.location.origin}</code>
+          </div>
+        `;
+      }
+    }
+
+    async function checkFirebaseAuth() {
+      const output = document.getElementById('authStatus');
+      
+      const auth = window.auth || (window.Auth && window.Auth.firebaseAuth && window.Auth.firebaseAuth());
+      
+      if (!auth) {
+        output.innerHTML = `
+          <div class="info error">
+            <strong>❌ Firebase Auth not initialized</strong><br>
+            <code>window.auth</code> is undefined
+          </div>
+        `;
+        return;
+      }
+      
+      if (auth.currentUser) {
+        output.innerHTML = `
+          <div class="info success">
+            <strong>✅ User is logged in</strong><br>
+            Email: <code>${auth.currentUser.email}</code><br>
+            UID: <code>${auth.currentUser.uid}</code><br>
+            Display Name: <code>${auth.currentUser.displayName || 'Not set'}</code>
+          </div>
+        `;
+      } else {
+        output.innerHTML = `
+          <div class="info warning">
+            <strong>⚠️ No user logged in</strong><br>
+            Firebase Auth is initialized but no active session.<br>
+            <em>Note: Some API endpoints may require authentication.</em>
+          </div>
+        `;
+      }
+    }
+
+    async function checkIdToken() {
+      const output = document.getElementById('authStatus');
+      
+      try {
+        const auth = window.auth || (window.Auth && window.Auth.firebaseAuth && window.Auth.firebaseAuth());
+        
+        if (!auth || !auth.currentUser) {
+          output.innerHTML = `
+            <div class="info error">
+              <strong>❌ Cannot get ID token - No user logged in</strong>
+            </div>
+          `;
+          return;
+        }
+        
+        const token = await auth.currentUser.getIdToken();
+        output.innerHTML = `
+          <div class="info success">
+            <strong>✅ ID Token retrieved successfully!</strong><br>
+            Token (first 50 chars): <code>${token.substring(0, 50)}...</code><br>
+            Length: ${token.length} characters
+          </div>
+        `;
+      } catch (err) {
+        output.innerHTML = `
+          <div class="info error">
+            <strong>❌ Failed to get ID token</strong><br>
+            Error: ${err.message}
+          </div>
+        `;
+      }
+    }
+
+    function testCustomUrl() {
+      const output = document.getElementById('urlStatus');
+      const newUrl = prompt('Enter new API base URL:', window.API.baseUrl());
+      
+      if (newUrl) {
+        window.API.setBaseUrl(newUrl);
+        output.innerHTML = `
+          <div class="info success">
+            <strong>✅ API URL updated!</strong><br>
+            New URL: <code>${newUrl}</code>
+          </div>
+        `;
+        document.getElementById('currentUrl').textContent = newUrl;
+      }
+    }
+
+    async function testPlansEndpoint() {
+      const output = document.getElementById('apiTest');
+      output.innerHTML = '<p>🔄 Testing /api/plans...</p>';
+      
+      try {
+        const data = await window.API.plans();
+        output.innerHTML = `
+          <div class="info success">
+            <strong>✅ Plans API working!</strong><br>
+            Plans found: ${data.plans?.length || 0}
+          </div>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+        `;
+      } catch (err) {
+        output.innerHTML = `
+          <div class="info error">
+            <strong>❌ Plans API failed</strong><br>
+            Error: ${err.message}
+          </div>
+        `;
+      }
+    }
+
+    async function testHealthEndpoint() {
+      const output = document.getElementById('apiTest');
+      output.innerHTML = '<p>🔄 Testing /api/health...</p>';
+      
+      try {
+        const baseUrl = window.API.baseUrl();
+        const res = await fetch(`${baseUrl}/api/health`);
+        const data = await res.json();
+        
+        output.innerHTML = `
+          <div class="info success">
+            <strong>✅ Health endpoint working!</strong>
+          </div>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+        `;
+      } catch (err) {
+        output.innerHTML = `
+          <div class="info error">
+            <strong>❌ Health endpoint failed</strong><br>
+            Error: ${err.message}
+          </div>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Panel • CredHive X</title>
+  <style>
+    :root{ --primary:#ff6b00; --accent:#ff8533; --text:#132028; --muted:#657281; --border:#e6edf3; --card:#fff; --radius:14px }
+    body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:#f6f9fb;color:var(--text);margin:0;padding:24px}
+    .container{max-width:1000px;margin:0 auto}
+    header{display:flex;align-items:center;justify-content:space-between;padding:12px 0;margin-bottom:16px;border-bottom:1px solid var(--border)}
+    .title{font-weight:900}
+    .btn{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text);font-weight:800;cursor:pointer}
+    .btn.primary{background:linear-gradient(90deg,var(--primary),var(--accent));color:#fff;border:none}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-top:16px}
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <div class="title">⚙️ Admin Panel • CredHive X</div>
+        <div class="muted">Fresh admin login flow (client-side)</div>
+      </div>
+      <div>
+        <button class="btn" id="backHome">← Home</button>
+        <button class="btn" id="logout">Logout</button>
+      </div>
+    </header>
+
+    <div class="card">
+      <h2>Welcome</h2>
+      <p class="muted">You're signed in as admin. Build out controls here.</p>
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn primary" id="openPlanner">Open Planner</button>
+        <button class="btn" id="manageUsers">Users</button>
+        <button class="btn" id="manageContent">Content</button>
+        <button class="btn" id="manageFeatures">Features</button>
+        <button class="btn" id="viewKyc">KYC Submissions</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function requireAdmin(){
+      const token = localStorage.getItem('admin_token');
+      if(!token){
+        alert('Admin login required.');
+        window.location.href = 'index.html';
+      }
+    }
+    requireAdmin();
+
+    document.getElementById('logout').addEventListener('click', ()=>{
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_token_ts');
+      alert('Logged out.');
+      window.location.href = 'index.html';
+    });
+    document.getElementById('backHome').addEventListener('click', ()=>{
+      window.location.href = 'index.html';
+    });
+    document.getElementById('openPlanner').addEventListener('click', ()=>{
+      window.location.href = 'main-interface.html';
+    });
+    // Placeholder actions
+    ['manageUsers','manageContent','manageFeatures','viewKyc'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el){ el.addEventListener('click', ()=> alert('Coming soon: '+id)); }
+    });
+  </script>
+</body>
+</html>
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KYC Admin</title>
+  <style>
+    body{font-family:Inter,Arial,Helvetica,sans-serif;padding:18px;background:#f6fbfb}
+    .panel{max-width:980px;margin:0 auto;background:#fff;padding:16px;border-radius:10px;border:1px solid #e6edf3}
+    .item{padding:10px;border-radius:8px;border:1px solid #eef6f8;margin-bottom:8px;background:#fbfeff}
+    .muted{color:#64748b}
+    button{padding:8px 10px;border-radius:8px;border:1px solid #e6edf3;background:#fff;cursor:pointer}
+    button.primary{background:#10B981;color:#fff;border:none}
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h2 style="margin:0">Admin — KYC Submissions</h2>
+    <div class="muted" style="margin-top:6px">Use your admin credentials to login. Then review, approve, or delete.</div>
+    <div id="loginBox" style="margin-top:12px;display:flex;gap:8px;align-items:center">
+      <input id="adminUser" placeholder="Admin username" style="padding:8px;border:1px solid #e6edf3;border-radius:8px" />
+      <input id="adminPass" type="password" placeholder="Password" style="padding:8px;border:1px solid #e6edf3;border-radius:8px" />
+      <button class="primary" onclick="adminLogin()">Login</button>
+      <button onclick="adminLogout()">Logout</button>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+      <button onclick="loadList()">Refresh</button>
+      <button onclick="exportAll()">Export All</button>
+    </div>
+    <div id="list" style="margin-top:12px"></div>
+  </div>
+<script>
+const ADMIN_TOKEN_KEY = 'admin_token';
+
+function getToken(){ return localStorage.getItem(ADMIN_TOKEN_KEY); }
+function setToken(t){ t?localStorage.setItem(ADMIN_TOKEN_KEY,t):localStorage.removeItem(ADMIN_TOKEN_KEY); }
+function authHeaders(){ const t=getToken(); return t?{ 'Authorization':'Bearer '+t }:{}; }
+
+async function adminLogin(){
+  const username = document.getElementById('adminUser').value.trim();
+  const password = document.getElementById('adminPass').value;
+  const res = await fetch('/auth/admin/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ username, password }) });
+  if(res.ok){ const j = await res.json(); setToken(j.token); document.getElementById('loginBox').style.display='none'; loadList(); }
+  else { alert('Invalid admin credentials'); }
+}
+function adminLogout(){ setToken(''); document.getElementById('loginBox').style.display='flex'; document.getElementById('list').innerHTML=''; }
+
+async function ensureLogin(){ if(!getToken()){ document.getElementById('loginBox').style.display='flex'; throw new Error('not logged in'); } }
+
+async function loadList(){
+  try{ await ensureLogin(); }catch(_){ return; }
+  const res = await fetch('/api/admin/submissions', { headers: authHeaders() });
+  if(!res.ok){ if(res.status===401) { adminLogout(); return; } alert('Failed to load'); return; }
+  const arr = await res.json();
+  const wrap = document.getElementById('list'); wrap.innerHTML = '';
+  if(!arr || arr.length===0){ wrap.innerHTML = '<div class="muted">No submissions</div>'; return; }
+  arr.forEach(entry => {
+    const div = document.createElement('div'); div.className='item';
+    const header = `<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:800">${entry.id}</div><div class="muted">${entry.receivedAt}</div></div>`;
+    const body = `<pre style="white-space:pre-wrap;margin-top:8px">${JSON.stringify(entry.payload, null, 2)}</pre>`;
+    const actions = `<div style="display:flex;gap:8px;margin-top:8px"><button class="primary" onclick="approve('${entry.id}')">Approve</button><button onclick="del('${entry.id}')">Delete</button><button onclick="exportOne('${entry.id}')">Export</button></div>`;
+    div.innerHTML = header + body + actions;
+    wrap.appendChild(div);
+  });
+}
+
+async function approve(id){
+  const note = prompt('Optional admin note to include in approval email:','Approved');
+  const res = await fetch('/api/admin/approve', {method:'POST', headers:Object.assign({'Content-Type':'application/json'}, authHeaders()), body: JSON.stringify({id, adminNote: note})});
+  if(res.ok) { alert('Approval sent (server attempted email).'); loadList(); } else { if(res.status===401) adminLogout(); else alert('Failed to approve'); }
+}
+async function del(id){ if(!confirm('Delete '+id+'?')) return; const res = await fetch('/api/admin/delete',{method:'POST',headers:Object.assign({'Content-Type':'application/json'}, authHeaders()),body: JSON.stringify({id})}); if(res.ok) { alert('Deleted'); loadList(); } else { if(res.status===401) adminLogout(); else alert('Delete failed'); } }
+async function exportOne(id){ const res = await fetch('/api/admin/submissions', { headers: authHeaders() }); if(!res.ok){ if(res.status===401) adminLogout(); else alert('Failed'); return; } const arr = await res.json(); const item = arr.find(x=>x.id===id); if(!item){ alert('Not found'); return;} const blob = new Blob([JSON.stringify(item, null,2)],{type:'application/json'}); const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=id+'.json'; document.body.appendChild(a); a.click(); a.remove(); }
+async function exportAll(){ const res = await fetch('/api/admin/submissions', { headers: authHeaders() }); if(!res.ok){ if(res.status===401) adminLogout(); else alert('Failed'); return; } const arr = await res.json(); const blob = new Blob([JSON.stringify(arr,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='kyc_all_server.json'; document.body.appendChild(a); a.click(); a.remove(); }
+
+// Auto-hide login if token exists
+if(getToken()){ document.getElementById('loginBox').style.display='none'; loadList(); }
+</script>
+</body>
+</html>

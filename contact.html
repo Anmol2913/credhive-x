@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Contact Us — CredHive X</title>
+<link rel="stylesheet" href="auth.css" />
+<script defer src="auth.js"></script>
+<script defer src="site-config.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --primary:#ff6b00;
+    --accent:#ff8533;
+    --muted:#657281;
+    --text:#132028;
+    --bg:#f4f8f9;
+    --card:#ffffff;
+    --border:#e6edf3;
+    --radius:14px;
+    --shadow:0 10px 30px rgba(16,24,40,0.06);
+    --maxw:1200px;
+  }
+  body{
+    font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+    color:var(--text);
+    background: linear-gradient(180deg,#fbffff 0%,var(--bg) 100%);
+    padding:28px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .container{max-width:var(--maxw);margin:0 auto}
+  header{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 6px;margin-bottom:28px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-weight:800;font-size:22px;box-shadow:0 6px 18px rgba(255,107,0,0.12)}
+  .site-title{font-weight:800;font-size:18px;line-height:1}
+  .site-sub{font-size:13px;color:var(--muted)}
+  nav{display:flex;gap:14px;align-items:center}
+  nav a{color:var(--muted);text-decoration:none;font-weight:700;padding:8px 10px;border-radius:10px;transition:all .18s}
+  nav a:hover{background:rgba(16,24,40,0.03);color:var(--text)}
+  nav a.cta{background:linear-gradient(90deg,var(--primary),var(--accent));color:#fff;box-shadow:0 8px 20px rgba(255,107,0,0.12)}
+  @media (max-width:720px){ nav{display:none} }
+
+  .hero{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start;margin-bottom:32px}
+  @media (max-width:980px){ .hero{grid-template-columns:1fr} }
+
+  .card{background:var(--card);border-radius:var(--radius);padding:18px;border:1px solid var(--border);box-shadow:var(--shadow)}
+  .title{font-size:28px;font-weight:800;margin-bottom:12px}
+  .subtitle{color:var(--muted);margin-bottom:14px;font-size:15px}
+
+  .contact-form{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+  .form-group{display:flex;flex-direction:column;gap:6px}
+  .form-group label{font-weight:700;font-size:14px}
+  .form-group input,.form-group textarea{padding:12px;border-radius:10px;border:1px solid var(--border);font-family:inherit;font-size:14px}
+  .form-group textarea{resize:vertical;min-height:120px}
+  .form-group input:focus,.form-group textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(255,107,0,0.1)}
+  .btn{display:inline-flex;gap:10px;align-items:center;padding:12px 18px;border-radius:12px;border:none;background:linear-gradient(90deg,var(--primary),var(--accent));color:#fff;font-weight:800;cursor:pointer;transition:transform .12s,box-shadow .12s;box-shadow:0 12px 30px rgba(255,107,0,0.12)}
+  .btn:hover{transform:translateY(-4px);box-shadow:0 14px 35px rgba(255,107,0,0.16)}
+  .btn:active{transform:translateY(-2px)}
+
+  .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+  @media (max-width:768px){ .info-grid{grid-template-columns:1fr} }
+  .info-card{padding:16px;background:linear-gradient(180deg,#fff,#fbfff9);border:1px solid rgba(16,185,129,0.06);border-radius:12px;text-align:center}
+  .info-card .icon{font-size:28px;margin-bottom:8px}
+  .info-card .label{font-weight:800;font-size:14px}
+  .info-card .value{color:var(--muted);font-size:13px;margin-top:6px}
+
+  footer{margin-top:40px;text-align:center;color:var(--muted);font-size:13px;padding-top:20px;border-top:1px solid var(--border)}
+  footer a{color:var(--primary);text-decoration:none;font-weight:700}
+  footer a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"><img src="logo.svg" alt="CredHive X" style="width: 100%; height: 100%; object-fit: contain;"></div>
+        <div>
+          <div class="site-title">CredHive X</div>
+          <div class="site-sub">Contact Us</div>
+        </div>
+      </div>
+      <nav aria-label="Main navigation">
+        <a href="index.html#features">Features</a>
+        <a href="index.html#lenders-section">Lenders</a>
+        <a href="index.html#vault">Savings</a>
+        <a href="contact.html">Contact</a>
+        <a href="terms.html">Terms</a>
+        <a class="cta" href="main-interface.html">Open EMI Planner</a>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="card">
+        <div class="title">Get in Touch</div>
+        <div class="subtitle">Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</div>
+
+        <form class="contact-form" onsubmit="handleContactSubmit(event)">
+          <div class="form-group">
+            <label for="name">Your Name</label>
+            <input id="name" type="text" placeholder="Enter your full name" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input id="email" type="email" placeholder="your.email@example.com" required>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input id="phone" type="tel" placeholder="+91 XXXXX XXXXX">
+          </div>
+
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <input id="subject" type="text" placeholder="What is this about?" required>
+          </div>
+
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" placeholder="Tell us more about your inquiry..." required></textarea>
+          </div>
+
+          <button type="submit" class="btn">Send Message</button>
+        </form>
+
+        <div style="margin-top:20px;padding:12px;background:#f0fdf4;border:1px solid #dcfce7;border-radius:10px;font-size:13px;color:#166534">
+          ✓ We typically respond within 24 hours during business days.
+        </div>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="card">
+        <div class="title" style="font-size:22px">Contact Information</div>
+        
+        <div class="info-grid">
+          <div class="info-card">
+            <div class="icon">📧</div>
+            <div class="label">Email</div>
+            <div class="value"><a href="mailto:support@credhivex.com" style="color:var(--primary)">support@credhivex.com</a></div>
+          </div>
+
+          <div class="info-card">
+            <div class="icon">📱</div>
+            <div class="label">Phone</div>
+            <div class="value"><a href="tel:+918539801985" style="color:var(--primary)">+91 8539801985</a></div>
+          </div>
+
+          <div class="info-card">
+            <div class="icon">📍</div>
+            <div class="label">Address</div>
+            <div class="value">Gurgaon, India</div>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;padding:14px;background:linear-gradient(135deg,rgba(255,107,0,0.05),rgba(255,133,51,0.05));border-radius:10px">
+          <div style="font-weight:800;margin-bottom:8px">Office Hours</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6">
+            Monday - Friday: 9:00 AM - 6:00 PM IST<br>
+            Saturday - Sunday: Closed<br>
+            <br>
+            Response times may vary during holidays.
+          </div>
+        </div>
+
+        <div style="margin-top:14px;padding:14px;background:#f5f3ff;border-radius:10px">
+          <div style="font-weight:800;margin-bottom:8px">Follow Us</div>
+          <div style="display:flex;gap:10px">
+            <a href="#" style="text-decoration:none;color:var(--primary);font-weight:800">LinkedIn</a>
+            <a href="#" style="text-decoration:none;color:var(--primary);font-weight:800">Twitter</a>
+            <a href="#" style="text-decoration:none;color:var(--primary);font-weight:800">Facebook</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div style="margin-bottom:12px">© 2025 CredHive X • Professional EMI & Savings Tool</div>
+      <div>
+        <a href="terms.html">Terms & Conditions</a> • 
+        <a href="#privacy">Privacy Policy</a> • 
+        <a href="#disclaimer">Disclaimer</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    function handleContactSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
+      const subject = document.getElementById('subject').value;
+      const message = document.getElementById('message').value;
+
+      // Attempt to send via backend (if available)
+      fetch('http://127.0.0.1:3000/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, subject, message })
+      }).then(r => {
+        if (r.ok) {
+          alert('Message sent successfully! We will get back to you soon.');
+          document.querySelector('.contact-form').reset();
+        } else {
+          throw new Error('server error');
+        }
+      }).catch(() => {
+        // Fallback: open mail client
+        const mailBody = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nPhone: ${phone}\n\n${message}`);
+        window.open(`mailto:support@credhivex.com?subject=${encodeURIComponent(subject)}&body=${mailBody}`);
+      });
+    }
+  </script>
+</body>
+</html>

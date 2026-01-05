@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Verification & Setup - CredHive X</title>
+<style>
+  /* Reset + variables */
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --primary:#10b981;
+    --accent:#34d399;
+    --muted:#657281;
+    --text:#132028;
+    --bg:#f9fbfc;
+    --card:#ffffff;
+    --border:#e6edf3;
+    --radius:14px;
+    --shadow:0 8px 20px rgba(16,24,40,0.04);
+    --maxw:1200px;
+    --ease: cubic-bezier(.2,.9,.3,1);
+  }
+
+  body{
+    font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+    color:var(--text);
+    background: radial-gradient(800px 300px at 10% 0%, rgba(16,185,129,0.03), transparent 12%), linear-gradient(180deg,#f0fdf4 0%,var(--bg) 100%);
+    padding:28px;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.6;
+    min-height:100vh;
+  }
+
+  .container{max-width:var(--maxw);margin:0 auto}
+
+  /* Header */
+  header{display:flex;align-items:center;justify-content:space-between;padding:16px 0;margin-bottom:32px;border-bottom:1px solid var(--border)}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-weight:800;font-size:20px;box-shadow:0 6px 18px rgba(16,185,129,0.12)}
+  .site-title{font-weight:800;font-size:16px}
+  .site-sub{font-size:12px;color:var(--muted)}
+
+  .back-btn{display:inline-flex;gap:8px;align-items:center;padding:10px 16px;border:1px solid var(--border);background:#fff;border-radius:10px;text-decoration:none;color:var(--text);font-weight:700;cursor:pointer;transition:all 0.2s var(--ease);font-size:14px}
+  .back-btn:hover{background:rgba(16,185,129,0.08);border-color:var(--primary);color:var(--primary)}
+
+  /* Hero section */
+  .hero{margin-bottom:48px}
+  .hero h1{font-size:42px;font-weight:900;margin-bottom:12px;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2}
+  .hero p{font-size:18px;color:var(--muted);max-width:700px}
+
+  /* Main grid */
+  .content-grid{display:grid;grid-template-columns:2fr 1fr;gap:32px;margin-bottom:48px}
+  @media (max-width:1024px){.content-grid{grid-template-columns:1fr}}
+
+  /* Process section */
+  .process-section h2{font-size:28px;font-weight:900;margin-bottom:24px;color:var(--text)}
+
+  .timeline-full{display:flex;flex-direction:column;gap:24px;margin-bottom:32px}
+  .timeline-step{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:flex-start}
+  .step-number{width:60px;height:60px;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:24px;flex-shrink:0;box-shadow:0 8px 20px rgba(16,185,129,0.15);position:relative;z-index:2}
+
+  .step-content{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:24px;transition:all 0.3s var(--ease)}
+  .step-content:hover{border-color:var(--primary);box-shadow:0 12px 30px rgba(16,185,129,0.1)}
+  .step-content h3{font-size:18px;font-weight:900;margin-bottom:12px;color:var(--primary)}
+  .step-content p{color:var(--muted);margin-bottom:16px;font-size:14px;line-height:1.6}
+
+  .step-details{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+  @media (max-width:768px){.step-details{grid-template-columns:1fr}}
+
+  .detail-box{background:linear-gradient(135deg,rgba(16,185,129,0.05),rgba(52,211,153,0.05));border-radius:10px;padding:14px;border-left:3px solid var(--primary)}
+  .detail-box strong{color:var(--primary);display:block;margin-bottom:4px}
+  .detail-box p{font-size:13px;color:var(--text)}
+
+  /* KYC Documents */
+  .kyc-section{margin-bottom:48px}
+  .kyc-section h2{font-size:24px;font-weight:900;margin-bottom:24px}
+
+  .documents-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+  @media (max-width:768px){.documents-grid{grid-template-columns:1fr}}
+
+  .doc-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:24px;text-align:center;transition:all 0.3s var(--ease);cursor:pointer}
+  .doc-card:hover{border-color:var(--primary);transform:translateY(-4px);box-shadow:0 12px 30px rgba(16,185,129,0.15)}
+  .doc-icon{font-size:48px;margin-bottom:12px}
+  .doc-name{font-size:16px;font-weight:900;margin-bottom:8px;color:var(--text)}
+  .doc-examples{font-size:12px;color:var(--muted);line-height:1.5}
+
+  /* Right sidebar */
+  .sidebar{display:flex;flex-direction:column;gap:24px}
+  
+  .info-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)}
+  .info-card.highlight{border-color:var(--primary);background:linear-gradient(135deg,rgba(16,185,129,0.05),rgba(52,211,153,0.05))}
+  .info-card h3{font-size:16px;font-weight:900;margin-bottom:16px;color:var(--primary);display:flex;gap:8px;align-items:center}
+  .info-card ul{list-style:none}
+  .info-card li{padding:10px 0;color:var(--text);font-size:14px;display:flex;gap:10px;align-items:flex-start}
+  .info-card li:before{content:'✓';color:var(--primary);font-weight:900;width:16px;flex-shrink:0}
+
+  /* Security box */
+  .security-box{background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(52,211,153,0.1));border:2px solid var(--primary);border-radius:var(--radius);padding:24px}
+  .security-box h3{font-size:14px;font-weight:900;margin-bottom:14px;color:var(--primary)}
+  .security-feature{display:flex;gap:10px;margin-bottom:10px;font-size:13px}
+  .security-feature:before{content:'🔒';margin-right:4px}
+  .security-feature strong{color:var(--primary)}
+
+  /* Timeline mini */
+  .timeline-mini{margin-top:20px}
+  .timeline-mini h4{font-size:12px;font-weight:900;color:var(--primary);margin-bottom:12px;text-transform:uppercase}
+  .timeline-mini-item{display:flex;gap:10px;margin-bottom:12px;align-items:flex-start;font-size:13px}
+  .timeline-mini-dot{width:24px;height:24px;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:11px;flex-shrink:0}
+  .timeline-mini-item p{color:var(--muted);margin:0}
+
+  /* CTA */
+  .cta-section{background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:var(--radius);padding:32px;color:#fff;text-align:center;box-shadow:0 16px 40px rgba(16,185,129,0.2)}
+  .cta-section h3{font-size:24px;font-weight:900;margin-bottom:12px}
+  .cta-section p{font-size:14px;opacity:0.95;margin-bottom:24px;line-height:1.6}
+  .cta-btn{display:inline-flex;gap:8px;align-items:center;padding:14px 32px;background:#fff;color:var(--primary);border:none;border-radius:12px;font-weight:900;cursor:pointer;font-size:15px;transition:all 0.2s var(--ease)}
+  .cta-btn:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(16,185,129,0.3)}
+
+  /* Footer */
+  footer{text-align:center;padding:32px 0;border-top:1px solid var(--border);color:var(--muted);font-size:13px}
+  footer a{color:var(--primary);text-decoration:none}
+  footer a:hover{text-decoration:underline}
+
+  @media (max-width:640px){
+    .hero h1{font-size:32px}
+    .timeline-step{gap:16px}
+    .content-grid{gap:24px}
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="logo">✅</div>
+      <div>
+        <div class="site-title">CredHive X</div>
+        <div class="site-sub">Verification & Setup</div>
+      </div>
+    </div>
+    <a href="index.html" class="back-btn">← Back to Home</a>
+  </header>
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>Finish Setup & Start Paying</h1>
+    <p>Quick verification process. Your data is fully protected with bank-grade encryption. Get approved in minutes and start your payment plan.</p>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="content-grid">
+    <!-- Left: Process -->
+    <div>
+      <!-- Timeline Process -->
+      <div class="process-section">
+        <h2>⏱️ Verification Timeline</h2>
+        <div class="timeline-full">
+          <!-- Step 1 -->
+          <div class="timeline-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h3>📄 Upload Documents</h3>
+              <p>Share your ID proof, address proof, bank details, and income proof. Takes just 2 minutes.</p>
+              <div class="step-details">
+                <div class="detail-box">
+                  <strong>📋 ID Proof:</strong>
+                  <p>PAN, Aadhaar, or License</p>
+                </div>
+                <div class="detail-box">
+                  <strong>🏠 Address Proof:</strong>
+                  <p>Utility Bill, Rent Receipt</p>
+                </div>
+              </div>
+              <div class="step-details" style="margin-top:12px">
+                <div class="detail-box">
+                  <strong>🏦 Bank Details:</strong>
+                  <p>Account Number & IFSC</p>
+                </div>
+                <div class="detail-box">
+                  <strong>💼 Income Proof:</strong>
+                  <p>Salary Slip or ITR</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="timeline-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h3>⚡ Instant Verification</h3>
+              <p>Our system automatically verifies your documents using advanced technology. No manual delays.</p>
+              <div class="step-details">
+                <div class="detail-box">
+                  <strong>🔍 Automated Check:</strong>
+                  <p>Less than 1 minute</p>
+                </div>
+                <div class="detail-box">
+                  <strong>✅ Real-time Status:</strong>
+                  <p>See updates instantly</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="timeline-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h3>✨ Approval & Activation</h3>
+              <p>Get approved within 5 minutes. Your payment plan is activated immediately and you're ready to go!</p>
+              <div class="step-details">
+                <div class="detail-box">
+                  <strong>🎉 Approval Time:</strong>
+                  <p>5 minutes average</p>
+                </div>
+                <div class="detail-box">
+                  <strong>🚀 Start Paying:</strong>
+                  <p>Same day setup</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KYC Documents -->
+      <div class="kyc-section">
+        <h2>📋 Documents You'll Need</h2>
+        <div class="documents-grid">
+          <!-- ID Proof -->
+          <div class="doc-card">
+            <div class="doc-icon">📋</div>
+            <div class="doc-name">ID Proof</div>
+            <div class="doc-examples">
+              Aadhaar, PAN Card,<br/>or Driving License
+            </div>
+          </div>
+
+          <!-- Address Proof -->
+          <div class="doc-card">
+            <div class="doc-icon">🏠</div>
+            <div class="doc-name">Address Proof</div>
+            <div class="doc-examples">
+              Electricity Bill, Rent<br/>Receipt, or Phone Bill
+            </div>
+          </div>
+
+          <!-- Bank Details -->
+          <div class="doc-card">
+            <div class="doc-icon">🏦</div>
+            <div class="doc-name">Bank Details</div>
+            <div class="doc-examples">
+              Account Number,<br/>IFSC Code & Branch
+            </div>
+          </div>
+
+          <!-- Income Proof -->
+          <div class="doc-card">
+            <div class="doc-icon">💼</div>
+            <div class="doc-name">Income Proof</div>
+            <div class="doc-examples">
+              Salary Slip, Bank<br/>Statement, or ITR
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Sidebar -->
+    <div class="sidebar">
+      <!-- Why needed -->
+      <div class="info-card highlight">
+        <h3>❓ Why We Need These</h3>
+        <ul>
+          <li>ID Proof: Confirm your identity</li>
+          <li>Address: Verify your location</li>
+          <li>Bank Details: Setup payments</li>
+          <li>Income: Calculate your limit</li>
+        </ul>
+      </div>
+
+      <!-- Security -->
+      <div class="security-box">
+        <h3>🔒 Your Security Matters</h3>
+        <div class="security-feature">
+          <strong>Bank-Grade Encryption</strong>
+        </div>
+        <div class="security-feature">
+          <strong>GDPR Compliant</strong>
+        </div>
+        <div class="security-feature">
+          <strong>RBI Regulated</strong>
+        </div>
+        <div class="security-feature">
+          <strong>Zero Hidden Data</strong>
+        </div>
+
+        <div class="timeline-mini">
+          <h4>Data Usage</h4>
+          <div class="timeline-mini-item">
+            <div class="timeline-mini-dot">✓</div>
+            <p><strong>Only for verification</strong> - Not sold or shared</p>
+          </div>
+          <div class="timeline-mini-item">
+            <div class="timeline-mini-dot">✓</div>
+            <p><strong>Encrypted storage</strong> - Military-grade security</p>
+          </div>
+          <div class="timeline-mini-item">
+            <div class="timeline-mini-dot">✓</div>
+            <p><strong>You control access</strong> - Delete anytime</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tips -->
+      <div class="info-card">
+        <h3>💡 Pro Tips</h3>
+        <ul>
+          <li>Clear documents = Fast approval</li>
+          <li>Recent income proof works best</li>
+          <li>Keep copies for your records</li>
+          <li>Take photos with good lighting</li>
+        </ul>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-section">
+        <h3>All Set? ✅</h3>
+        <p>Upload your documents and get approved in 5 minutes.</p>
+        <a href="index.html" class="cta-btn">Start Now →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>Questions? <a href="index.html">Contact support</a> or <a href="index.html">go back</a></p>
+  </footer>
+</div>
+
+</body>
+</html>

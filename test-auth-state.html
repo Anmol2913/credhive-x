@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head><title>Auth State Test</title></head>
+<body>
+<h1>Auth State Checker</h1>
+<pre id="output"></pre>
+<script>
+const out = document.getElementById('output');
+const checks = {
+  'auth_user_firebase': localStorage.getItem('auth_user_firebase'),
+  'auth_token_firebase': localStorage.getItem('auth_token_firebase'),
+  'auth_user': localStorage.getItem('auth_user'),
+  'auth_token': localStorage.getItem('auth_token'),
+  'auth_current': localStorage.getItem('auth_current'),
+  'auth_method': localStorage.getItem('auth_method')
+};
+out.textContent = JSON.stringify(checks, null, 2);
+</script>
+</body>
+</html>

@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sign Up - CredHive X</title>
+<meta name="description" content="Create a new CredHive X account and manage your payment plans" />
+
+<link rel="stylesheet" href="auth-firebase.css" />
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; }
+  body {
+    font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+    background: linear-gradient(135deg, #f0fff4 0%, #fcfeff 50%, #f0f7ff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  
+  .signup-wrapper {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .back-link {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 24px;
+    color: var(--auth-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+
+  .back-link:hover {
+    gap: 10px;
+  }
+
+  .logo-center {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .logo-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #10b981, #34d399);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    margin: 0 auto 16px;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
+  }
+
+  .logo-text h2 {
+    font-size: 24px;
+    font-weight: 900;
+    color: #132028;
+    margin-bottom: 4px;
+  }
+
+  .logo-text p {
+    font-size: 14px;
+    color: #657281;
+  }
+
+  .form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .social-login {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .social-btn {
+    padding: 12px;
+    border: 1px solid var(--auth-border);
+    border-radius: 10px;
+    background: var(--auth-card);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s var(--auth-ease);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .social-btn:hover {
+    border-color: #10b981;
+    background: #fafafa;
+  }
+
+  .social-btn:active {
+    transform: scale(0.98);
+  }
+
+  .error-msg {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid #ef4444;
+    color: #7f1d1d;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    display: none;
+  }
+
+  .success-msg {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid #10b981;
+    color: #065f46;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    display: none;
+  }
+
+  .login-link {
+    text-align: center;
+    font-size: 14px;
+    color: #657281;
+  }
+
+  .login-link a {
+    color: var(--auth-primary);
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .login-link a:hover {
+    text-decoration: underline;
+  }
+
+  .password-input-wrapper {
+    position: relative;
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--auth-muted);
+    transition: color 0.2s;
+  }
+
+  .toggle-password:hover {
+    color: #10b981;
+  }
+
+  .password-strength {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+  }
+
+  .strength-bar {
+    flex: 1;
+    height: 4px;
+    background: #e6edf3;
+    border-radius: 2px;
+  }
+
+  .strength-bar.weak { background: #ef4444; }
+  .strength-bar.medium { background: #f59e0b; }
+  .strength-bar.strong { background: #10b981; }
+
+  .strength-text {
+    font-size: 12px;
+    margin-top: 4px;
+    color: #657281;
+  }
+
+  .loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(16, 185, 129, 0.3);
+    border-top-color: #10b981;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 480px) {
+    .logo-text h2 { font-size: 20px; }
+    .signup-wrapper { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="signup-wrapper">
+  <a href="index.html" class="back-link">← Back to Home</a>
+
+  <div class="logo-center">
+    <div class="logo-icon">✨</div>
+    <div class="logo-text">
+      <h2>CredHive X</h2>
+      <p>Create your account</p>
+    </div>
+  </div>
+
+  <div class="auth-card">
+    <div class="form-section">
+      <!-- Messages -->
+      <div id="errorMsg" class="error-msg"></div>
+      <div id="successMsg" class="success-msg"></div>
+
+      <!-- Google Signup -->
+      <div>
+        <button type="button" id="googleSignupBtn" class="social-btn" style="width: 100%; gap: 12px;">
+          <span>🔍</span>
+          <span>Sign up with Google</span>
+        </button>
+      </div>
+
+      <!-- Divider -->
+      <div class="auth-divider">
+        <span>or</span>
+      </div>
+
+      <!-- Email/Password Form -->
+      <form id="signupForm" style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="auth-field">
+          <label for="name">Full Name</label>
+          <input 
+            id="name" 
+            type="text" 
+            placeholder="e.g., Ria Sharma" 
+            autocomplete="name"
+            required 
+          />
+        </div>
+
+        <div class="auth-field">
+          <label for="email">Email Address</label>
+          <input 
+            id="email" 
+            type="email" 
+            placeholder="you@example.com" 
+            autocomplete="email"
+            required 
+          />
+        </div>
+
+        <div class="auth-field">
+          <label for="password">Password</label>
+          <div class="password-input-wrapper">
+            <input 
+              id="password" 
+              type="password" 
+              placeholder="••••••••" 
+              autocomplete="new-password"
+              required 
+            />
+            <button type="button" class="toggle-password" id="togglePassword">👁️</button>
+          </div>
+          <div class="password-strength">
+            <div class="strength-bar"></div>
+            <div class="strength-bar"></div>
+            <div class="strength-bar"></div>
+          </div>
+          <div class="strength-text" id="strengthText">Weak password</div>
+        </div>
+
+        <label class="auth-checkbox">
+          <input type="checkbox" id="terms" required />
+          <span>I agree to the <a href="terms.html" style="color: #ff6b00; text-decoration: none;">Terms & Privacy Policy</a></span>
+        </label>
+
+        <button type="submit" class="btn-primary" style="width: 100%; gap: 10px; background: linear-gradient(135deg, #10b981, #34d399);">
+          <span id="btnText">✨ Create Account</span>
+        </button>
+      </form>
+
+      <!-- Login Link -->
+      <div class="login-link">
+        Already have an account? <a href="login.html">Login here</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #657281;">
+    Your data is secure and never shared. <a href="terms.html#privacy" style="color: #10b981; text-decoration: none;">Privacy Policy</a>
+  </div>
+</div>
+
+<!-- Firebase Scripts -->
+<script src="firebase-config.html"></script>
+<script src="auth-firebase.js"></script>
+
+<script>
+  const nameInput = document.getElementById('name');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const togglePasswordBtn = document.getElementById('togglePassword');
+  const termsCheckbox = document.getElementById('terms');
+  const signupForm = document.getElementById('signupForm');
+  const googleSignupBtn = document.getElementById('googleSignupBtn');
+  const errorMsg = document.getElementById('errorMsg');
+  const successMsg = document.getElementById('successMsg');
+  const btnText = document.getElementById('btnText');
+  const strengthBars = document.querySelectorAll('.strength-bar');
+  const strengthText = document.getElementById('strengthText');
+
+  // Password toggle
+  togglePasswordBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const isPassword = passwordInput.type === 'password';
+    passwordInput.type = isPassword ? 'text' : 'password';
+    togglePasswordBtn.textContent = isPassword ? '👁️‍🗨️' : '👁️';
+  });
+
+  // Password strength meter
+  passwordInput.addEventListener('input', () => {
+    const password = passwordInput.value;
+    let strength = 0;
+
+    if (password.length >= 8) strength++;
+    if (password.length >= 12) strength++;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[^a-zA-Z\d]/.test(password)) strength++;
+
+    const level = strength <= 1 ? 'weak' : strength <= 2 ? 'medium' : 'strong';
+    
+    strengthBars.forEach((bar, i) => {
+      bar.className = 'strength-bar';
+      if (i < Math.ceil(strength / 2)) {
+        bar.classList.add(level);
+      }
+    });
+
+    strengthText.textContent = 
+      strength <= 1 ? '❌ Weak password' :
+      strength <= 2 ? '⚠️ Medium - add numbers & symbols' :
+      '✅ Strong password';
+  });
+
+  // Email/Password Signup
+  signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    const termsAccepted = termsCheckbox.checked;
+
+    if (!name || !email || !password) {
+      showError('Please fill in all fields');
+      return;
+    }
+
+    if (!termsAccepted) {
+      showError('Please accept the terms and privacy policy');
+      return;
+    }
+
+    try {
+      showLoading();
+      await Auth.registerWithEmail(email, password, name);
+      
+      showSuccess('✅ Account created! Redirecting...');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
+    } catch (error) {
+      showError(error.message || 'Signup failed');
+    }
+  });
+
+  // Google Signup
+  googleSignupBtn.addEventListener('click', async () => {
+    try {
+      showLoading();
+      await Auth.loginWithGoogle(); // Google auth handles both signup and login
+      showSuccess('✅ Account created! Redirecting...');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
+    } catch (error) {
+      showError(error.message || 'Google signup failed. Use email/password instead.');
+      googleSignupBtn.disabled = false;
+    }
+  });
+
+  function showError(message) {
+    errorMsg.textContent = '❌ ' + message;
+    errorMsg.style.display = 'block';
+    successMsg.style.display = 'none';
+    btnText.textContent = '✨ Create Account';
+    googleSignupBtn.disabled = false;
+    setTimeout(() => errorMsg.style.display = 'none', 5000);
+  }
+
+  function showSuccess(message) {
+    successMsg.textContent = message;
+    successMsg.style.display = 'block';
+    errorMsg.style.display = 'none';
+  }
+
+  function showLoading() {
+    btnText.innerHTML = '<span class="loading"></span> Creating account...';
+    googleSignupBtn.disabled = true;
+  }
+
+  // Redirect if already logged in
+  if (Auth.getCurrentUser()) {
+    window.location.href = 'index.html';
+  }
+</script>
+
+</body>
+</html>

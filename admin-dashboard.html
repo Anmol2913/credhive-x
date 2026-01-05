@@ -1,0 +1,1218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Anmol Dashboard — CredHive X</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Tech Color Palette */
+  --dark-bg: #0a0c10;
+  --card-bg: rgba(20, 25, 35, 0.6);
+  --neon-orange: #ff6b00;
+  --neon-blue: #3b82f6;
+  --cyan-glow: #00d9ff;
+  --text-primary: #e0e8ff;
+  --text-secondary: #a0aec0;
+  --border-color: rgba(255, 107, 0, 0.2);
+  --success: #10b981;
+  --danger: #dc2626;
+  --radius: 16px;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+  background: linear-gradient(135deg, #87CEEB 0%, #00BFFF 50%, #87CEEB 100%);
+  color: var(--text-primary);
+  padding: 20px;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Animated Background */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(255, 107, 0, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* ===== HEADER ===== */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 24px 32px;
+  margin-bottom: 32px;
+  background: linear-gradient(135deg, rgba(45, 85, 110, 0.85) 0%, rgba(30, 70, 95, 0.85) 100%);
+  border-radius: var(--radius);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  animation: slideDown 0.6s cubic-bezier(0.2, 0.9, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255, 255, 255, 0.02) 2px, rgba(255, 255, 255, 0.02) 4px),
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.02) 2px, rgba(255, 255, 255, 0.02) 4px);
+  pointer-events: none;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--neon-orange), #ff8533);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 24px;
+  box-shadow: 
+    0 0 20px rgba(255, 107, 0, 0.5),
+    inset 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.site-title {
+  font-weight: 900;
+  font-size: 20px;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(255, 107, 0, 0.3);
+}
+
+.site-sub {
+  font-size: 13px;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+  backdrop-filter: blur(10px);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.btn.primary {
+  background: linear-gradient(135deg, var(--neon-orange), #ff8533);
+  color: #fff;
+  border: 2px solid var(--neon-orange);
+  box-shadow: 
+    0 0 20px rgba(255, 107, 0, 0.4),
+    inset 0 0 20px rgba(255, 255, 255, 0.1);
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.btn.primary:hover {
+  box-shadow: 
+    0 0 40px rgba(255, 107, 0, 0.6),
+    0 8px 24px rgba(255, 107, 0, 0.3),
+    inset 0 0 20px rgba(255, 255, 255, 0.15);
+}
+
+.btn.danger {
+  background: rgba(220, 38, 38, 0.2);
+  border: 2px solid rgba(220, 38, 38, 0.5);
+  color: #ff6b9d;
+}
+
+.btn.danger:hover {
+  background: rgba(220, 38, 38, 0.3);
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
+}
+
+/* ===== STATS GRID ===== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 32px;
+  animation: fadeIn 0.8s cubic-bezier(0.2, 0.9, 0.3, 1) 0.1s backwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 1200px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .stats { grid-template-columns: 1fr; } }
+
+.stat-card {
+  background: linear-gradient(135deg, rgba(45, 85, 110, 0.75) 0%, rgba(30, 70, 95, 0.75) 100%);
+  padding: 28px;
+  border-radius: var(--radius);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255, 255, 255, 0.03) 2px, rgba(255, 255, 255, 0.03) 4px),
+    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255, 255, 255, 0.02) 1px, rgba(255, 255, 255, 0.02) 2px);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 107, 0, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 
+    0 16px 48px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.stat-card:hover::after {
+  opacity: 1;
+}
+
+.stat-value {
+  font-size: 48px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ff8c00, #ffd699);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 12px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 2;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 2;
+  word-spacing: 4px;
+}
+
+/* ===== GLOWING TAB NAVIGATION ===== */
+.tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+  background: linear-gradient(135deg, rgba(30, 70, 95, 0.8) 0%, rgba(45, 85, 110, 0.8) 100%);
+  padding: 16px 20px;
+  border-radius: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  position: relative;
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+}
+
+.tabs::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.02) 10px, rgba(255, 255, 255, 0.02) 20px);
+  pointer-events: none;
+  border-radius: 20px;
+}
+
+/* Glowing underline */
+.tabs::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(255, 107, 0, 0.6), transparent);
+  width: 100%;
+  opacity: 0.5;
+  border-radius: 20px 20px 0 0;
+}
+
+.tab {
+  padding: 14px 28px;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 16px;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.tab:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.tab.active {
+  background: linear-gradient(135deg, rgba(255, 107, 0, 0.85) 0%, rgba(255, 140, 0, 0.75) 100%);
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(255, 107, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 0 20px rgba(255, 107, 0, 0.5);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  font-weight: 900;
+  position: relative;
+  letter-spacing: 1.3px;
+}
+
+.tab.active::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  border-radius: 10px;
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  border-radius: 10px;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--card-bg);
+  padding: 28px;
+  border-radius: var(--radius);
+  border: 2px solid var(--border-color);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  margin-bottom: 20px;
+  box-shadow: 
+    0 0 20px rgba(255, 107, 0, 0.08),
+    inset 0 0 15px rgba(255, 107, 0, 0.02);
+  animation: slideUp 0.6s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ===== TABLE ===== */
+.table-wrap {
+  overflow: auto;
+  border-radius: 12px;
+  border: 2px solid var(--border-color);
+  margin-top: 16px;
+  backdrop-filter: blur(10px);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th, td {
+  padding: 14px;
+  border-bottom: 1px solid rgba(255, 107, 0, 0.1);
+  text-align: left;
+}
+
+th {
+  background: rgba(255, 107, 0, 0.08);
+  font-weight: 700;
+  position: sticky;
+  top: 0;
+  color: var(--neon-orange);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 10;
+}
+
+tr:hover {
+  background: rgba(255, 107, 0, 0.05);
+  transition: all 0.2s;
+}
+
+td button {
+  padding: 8px 12px;
+  font-size: 12px;
+  margin-right: 6px;
+  border-radius: 8px;
+  border: 1px solid var(--neon-orange);
+  background: rgba(255, 107, 0, 0.1);
+  color: var(--neon-orange);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+}
+
+td button:hover {
+  background: var(--neon-orange);
+  color: white;
+  box-shadow: 0 0 15px rgba(255, 107, 0, 0.4);
+}
+
+/* ===== FORMS ===== */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 2px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  font: inherit;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--neon-orange);
+  background: rgba(255, 107, 0, 0.1);
+  box-shadow: 0 0 20px rgba(255, 107, 0, 0.2);
+}
+
+.form-group textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* ===== TOGGLES ===== */
+.feature-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-radius: 10px;
+  background: rgba(255, 107, 0, 0.08);
+  border: 2px solid var(--border-color);
+  margin-bottom: 12px;
+  transition: all 0.3s;
+}
+
+.feature-toggle:hover {
+  border-color: var(--neon-orange);
+  background: rgba(255, 107, 0, 0.12);
+}
+
+.toggle-switch {
+  position: relative;
+  width: 56px;
+  height: 28px;
+  background: rgba(255, 107, 0, 0.2);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 2px solid var(--neon-orange);
+}
+
+.toggle-switch.active {
+  background: var(--neon-orange);
+  box-shadow: 0 0 20px rgba(255, 107, 0, 0.5);
+}
+
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.toggle-switch.active::after {
+  left: 26px;
+}
+
+/* ===== LOGIN BOX ===== */
+.login-box {
+  max-width: 420px;
+  margin: 120px auto;
+  padding: 40px;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  border: 2px solid var(--border-color);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 
+    0 0 40px rgba(255, 107, 0, 0.15),
+    inset 0 0 20px rgba(255, 107, 0, 0.05);
+  animation: slideDown 0.6s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.login-box h2 {
+  margin-bottom: 8px;
+  color: #fff;
+  font-size: 28px;
+  background: linear-gradient(135deg, var(--neon-orange), #ffd699);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 20px rgba(255, 107, 0, 0.3);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.muted {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.success {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.error {
+  color: #ff6b9d;
+  font-weight: 700;
+  background: rgba(220, 38, 38, 0.15);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 2px solid rgba(220, 38, 38, 0.3);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .header-actions {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .tabs {
+    flex-wrap: wrap;
+  }
+  
+  .stat-card {
+    padding: 18px;
+  }
+  
+  .stat-value {
+    font-size: 32px;
+  }
+}
+</style>
+<script>
+// ===== ADMIN SESSION PROTECTION =====
+(function() {
+  console.log('🔒 Checking admin authentication...');
+  
+  const role = localStorage.getItem('role');
+  const adminToken = localStorage.getItem('admin_token');
+  const adminEmail = localStorage.getItem('admin_email');
+  
+  console.log('Session check:', { role, hasToken: !!adminToken, email: adminEmail });
+  
+  if (role === 'admin' && adminToken) {
+    console.log('✅ Admin session found - auto-authenticating...');
+    localStorage.setItem('admin_token', adminToken);
+    window.adminAuthenticated = true;
+  } else {
+    console.log('⚠️ No admin session found');
+    window.adminAuthenticated = false;
+  }
+})();
+</script>
+</head>
+<body>
+<div class="container" id="app">
+  <!-- Login Screen -->
+  <div id="loginScreen">
+    <div class="login-box">
+      <h2>🔐 ANMOL ACCESS</h2>
+      <p class="muted" style="margin-bottom:16px">💼 CredHive X Owner Panel - High-Tech Admin Suite</p>
+      <div id="loginError" class="error hidden"></div>
+      <div class="form-group">
+        <label for="adminUser">📧 Email</label>
+        <input id="adminUser" type="text" placeholder="admin@credhivx.com" />
+      </div>
+      <div class="form-group">
+        <label for="adminPass">🔑 Password</label>
+        <input id="adminPass" type="password" placeholder="••••••••" />
+      </div>
+      <button class="btn primary" onclick="adminLogin()" style="width:100%; padding: 16px; font-size: 15px; text-transform: uppercase; letter-spacing: 1px;">
+        🚀 ENTER COMMAND CENTER
+      </button>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="hidden">
+    <header>
+      <div class="brand">
+        <div class="logo">⚡</div>
+        <div>
+          <div class="site-title">⭐ ANMOL COMMAND CENTER</div>
+          <div class="site-sub">🚀 CredHive X High-Tech Admin Suite</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn" onclick="window.location.href='index.html'" style="border: 2px solid var(--cyan-glow); color: var(--cyan-glow);">👁 View Site</button>
+        <button class="btn danger" onclick="adminLogout()">🚪 Logout</button>
+      </div>
+    </header>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-value" id="totalUsers">0</div>
+        <div class="stat-label">👥 Total Users</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="totalKyc">0</div>
+        <div class="stat-label">📋 KYC Submissions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="activeFeatures">0</div>
+        <div class="stat-label">✨ Active Features</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="lastLogin">—</div>
+        <div class="stat-label">⏰ Last Activity</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('users')">👥 USERS</button>
+      <button class="tab" onclick="switchTab('content')">📝 CONTENT</button>
+      <button class="tab" onclick="switchTab('features')">⚙️ FEATURES</button>
+      <button class="tab" onclick="switchTab('kyc')">🔍 KYC REVIEW</button>
+    </div>
+
+    <!-- Users Tab -->
+    <div id="tabUsers" class="card">
+      <div class="card-title">
+        <span>👥 USER MANAGEMENT SYSTEM</span>
+        <button class="btn" onclick="refreshUsers()" style="border: 2px solid var(--cyan-glow); color: var(--cyan-glow);">🔄 REFRESH DATA</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Name</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usersList"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Content Tab -->
+    <div id="tabContent" class="card hidden">
+      <div class="card-title">
+        <span>📝 CONTENT MANAGEMENT ENGINE</span>
+        <button class="btn primary" onclick="saveContent()">💾 SAVE CHANGES</button>
+      </div>
+      
+      <div class="form-group">
+        <label>Hero Title</label>
+        <input id="heroTitle" type="text" />
+      </div>
+      
+      <div class="form-group">
+        <label>Hero Subtitle</label>
+        <textarea id="heroSubtitle"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Contact Email</label>
+        <input id="contactEmail" type="email" />
+      </div>
+
+      <div class="form-group">
+        <label>Contact Phone</label>
+        <input id="contactPhone" type="tel" />
+      </div>
+
+      <div class="form-group">
+        <label>Footer Text</label>
+        <input id="footerText" type="text" />
+      </div>
+    </div>
+
+    <!-- Features Tab -->
+    <div id="tabFeatures" class="card hidden">
+      <div class="card-title">
+        <span>Feature Toggles</span>
+        <button class="btn primary" onclick="saveFeatures()">Save Changes</button>
+      </div>
+      <p class="muted" style="margin-bottom:12px">Enable or disable site features. Changes apply immediately.</p>
+      
+      <div class="feature-toggle">
+        <div>
+          <strong>KYC Portal</strong>
+          <div class="muted">Allow users to submit KYC documents</div>
+        </div>
+        <div class="toggle-switch" id="featureKyc" onclick="toggleFeature('kyc')"></div>
+      </div>
+
+      <div class="feature-toggle">
+        <div>
+          <strong>EMI Calculator</strong>
+          <div class="muted">Display instant EMI calculation modal</div>
+        </div>
+        <div class="toggle-switch" id="featureEmi" onclick="toggleFeature('emi')"></div>
+      </div>
+
+      <div class="feature-toggle">
+        <div>
+          <strong>Savings Vault</strong>
+          <div class="muted">Enable savings planning features</div>
+        </div>
+        <div class="toggle-switch" id="featureVault" onclick="toggleFeature('vault')"></div>
+      </div>
+
+      <div class="feature-toggle">
+        <div>
+          <strong>Contact Form</strong>
+          <div class="muted">Show contact form on contact page</div>
+        </div>
+        <div class="toggle-switch" id="featureContact" onclick="toggleFeature('contact')"></div>
+      </div>
+
+      <div class="feature-toggle">
+        <div>
+          <strong>User Registration</strong>
+          <div class="muted">Allow new users to create accounts</div>
+        </div>
+        <div class="toggle-switch" id="featureRegister" onclick="toggleFeature('register')"></div>
+      </div>
+    </div>
+
+    <!-- KYC Tab -->
+    <div id="tabKyc" class="card hidden">
+      <div class="card-title">
+        <span>KYC Submissions Review</span>
+        <button class="btn" onclick="refreshKyc()">Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Submitted</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="kycList"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const BASE_URL = 'http://127.0.0.1:3000';
+const ADMIN_TOKEN_KEY = 'admin_token';
+let currentTab = 'users';
+let features = {};
+
+function getToken(){ return localStorage.getItem(ADMIN_TOKEN_KEY); }
+function setToken(t){ t ? localStorage.setItem(ADMIN_TOKEN_KEY, t) : localStorage.removeItem(ADMIN_TOKEN_KEY); }
+function authHeaders(){ const t = getToken(); return t ? { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' }; }
+
+async function adminLogin(){
+  const username = document.getElementById('adminUser').value.trim();
+  const password = document.getElementById('adminPass').value;
+  const err = document.getElementById('loginError');
+  err.classList.add('hidden');
+  
+  try{
+    const res = await fetch(`${BASE_URL}/auth/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    
+    if(res.ok){
+      const data = await res.json();
+      setToken(data.token);
+      showDashboard();
+    } else {
+      err.textContent = 'Invalid admin credentials';
+      err.classList.remove('hidden');
+    }
+  } catch(e){
+    err.textContent = 'Server error. Please try again.';
+    err.classList.remove('hidden');
+  }
+}
+
+function adminLogout(){
+  setToken('');
+  document.getElementById('dashboard').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+}
+
+function showDashboard(){
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('dashboard').classList.remove('hidden');
+  loadStats();
+  refreshUsers();
+  loadContent();
+  loadFeatures();
+}
+
+function switchTab(tab){
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  document.getElementById('tabUsers').classList.add('hidden');
+  document.getElementById('tabContent').classList.add('hidden');
+  document.getElementById('tabFeatures').classList.add('hidden');
+  document.getElementById('tabKyc').classList.add('hidden');
+  
+  if(tab === 'users'){
+    document.getElementById('tabUsers').classList.remove('hidden');
+    refreshUsers();
+  } else if(tab === 'content'){
+    document.getElementById('tabContent').classList.remove('hidden');
+  } else if(tab === 'features'){
+    document.getElementById('tabFeatures').classList.remove('hidden');
+  } else if(tab === 'kyc'){
+    document.getElementById('tabKyc').classList.remove('hidden');
+    refreshKyc();
+  }
+}
+
+async function loadStats(){
+  try{
+    const [usersRes, kycRes, featRes] = await Promise.all([
+      fetch(`${BASE_URL}/api/admin/users`, { headers: authHeaders() }),
+      fetch(`${BASE_URL}/api/admin/submissions`, { headers: authHeaders() }),
+      fetch(`${BASE_URL}/api/admin/features`, { headers: authHeaders() })
+    ]);
+    
+    if(usersRes.ok){
+      const users = await usersRes.json();
+      document.getElementById('totalUsers').textContent = users.length || 0;
+    }
+    
+    if(kycRes.ok){
+      const kyc = await kycRes.json();
+      document.getElementById('totalKyc').textContent = kyc.length || 0;
+    }
+    
+    if(featRes.ok){
+      const feat = await featRes.json();
+      const active = Object.values(feat).filter(v => v === true).length;
+      document.getElementById('activeFeatures').textContent = active;
+    }
+    
+    document.getElementById('lastLogin').textContent = new Date().toLocaleTimeString();
+  } catch(e){ console.error(e); }
+}
+
+async function refreshUsers(){
+  try{
+    const res = await fetch(`${BASE_URL}/api/admin/users`, { headers: authHeaders() });
+    if(!res.ok){ if(res.status === 401) adminLogout(); return; }
+    
+    const users = await res.json();
+    const tbody = document.getElementById('usersList');
+    tbody.innerHTML = '';
+    
+    if(!users || users.length === 0){
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted)">No users yet</td></tr>';
+      return;
+    }
+    
+    users.forEach(user => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${user.email}</td>
+        <td>${user.name}</td>
+        <td>${new Date(user.createdAt).toLocaleString()}</td>
+        <td>
+          <button class="btn" onclick="editUser('${user.email}')">Edit</button>
+          <button class="btn danger" onclick="deleteUser('${user.email}')">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch(e){ console.error(e); }
+}
+
+async function deleteUser(email){
+  if(!confirm(`Delete user ${email}?`)) return;
+  try{
+    const res = await fetch(`${BASE_URL}/api/admin/users/${encodeURIComponent(email)}`, {
+      method: 'DELETE',
+      headers: authHeaders()
+    });
+    if(res.ok){
+      alert('User deleted');
+      refreshUsers();
+      loadStats();
+    } else {
+      alert('Failed to delete user');
+    }
+  } catch(e){ alert('Error: ' + e.message); }
+}
+
+async function editUser(email){
+  const name = prompt('New name for ' + email);
+  if(!name) return;
+  try{
+    const res = await fetch(`${BASE_URL}/api/admin/users/${encodeURIComponent(email)}`, {
+      method: 'PATCH',
+      headers: authHeaders(),
+      body: JSON.stringify({ name })
+    });
+    if(res.ok){
+      alert('User updated');
+      refreshUsers();
+    } else {
+      alert('Failed to update user');
+    }
+  } catch(e){ alert('Error: ' + e.message); }
+}
+
+async function loadContent(){
+  try{
+    const res = await fetch(`${BASE_URL}/api/admin/content`, { headers: authHeaders() });
+    if(res.ok){
+      const data = await res.json();
+      document.getElementById('heroTitle').value = data.heroTitle || '';
+      document.getElementById('heroSubtitle').value = data.heroSubtitle || '';
+      document.getElementById('contactEmail').value = data.contactEmail || '';
+      document.getElementById('contactPhone').value = data.contactPhone || '';
+      document.getElementById('footerText').value = data.footerText || '';
+    }
+  } catch(e){ console.error(e); }
+}
+
+async function saveContent(){
+  const data = {
+    heroTitle: document.getElementById('heroTitle').value,
+    heroSubtitle: document.getElementById('heroSubtitle').value,
+    contactEmail: document.getElementById('contactEmail').value,
+    contactPhone: document.getElementById('contactPhone').value,
+    footerText: document.getElementById('footerText').value
+  };
+  
+  try{
+    const res = await fetch(`${BASE_URL}/api/admin/content`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify(data)
+    });
+    if(res.ok){
+      alert('Content updated successfully');
+    } else {
+      alert('Failed to save content');
+    }
+  } catch(e){ alert('Error: ' + e.message); }
+}
+
+async function loadFeatures(){
+  try{
+    const res = await fetch(`${BASE_URL}/api/admin/features`, { headers: authHeaders() });
+    if(res.ok){
+      features = await res.json();
+      updateFeatureToggles();
+    }
+  } catch(e){ console.error(e); }
+}
+
+function updateFeatureToggles(){
+  ['kyc', 'emi', 'vault', 'contact', 'register'].forEach(name => {
+    const el = document.getElementById('feature' + name.charAt(0).toUpperCase() + name.slice(1));
+    if(el){
+      if(features[name]) el.classList.add('active');
+      else el.classList.remove('active');
+    }
+  });
+}
+
+function toggleFeature(name){
+  features[name] = !features[name];
+  updateFeatureToggles();
+}
+
+async function saveFeatures(){
+  try{
+    const res = await fetch(`${BASE_URL}/api/admin/features`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify(features)
+    });
+    if(res.ok){
+      alert('Features updated successfully');
+      loadStats();
+    } else {
+      alert('Failed to save features');
+    }
+  } catch(e){ alert('Error: ' + e.message); }
+}
+
+async function refreshKyc(){
+  try{
+    const res = await fetch(`${BASE_URL}/api/admin/submissions`, { headers: authHeaders() });
+    if(!res.ok){ if(res.status === 401) adminLogout(); return; }
+    
+    const kyc = await res.json();
+    const tbody = document.getElementById('kycList');
+    tbody.innerHTML = '';
+    
+    if(!kyc || kyc.length === 0){
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted)">No submissions</td></tr>';
+      return;
+    }
+    
+    kyc.forEach(entry => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${entry.id}</td>
+        <td>${new Date(entry.receivedAt).toLocaleString()}</td>
+        <td><span class="success">${entry.status || 'pending'}</span></td>
+        <td>
+          <button class="btn" onclick="viewKyc('${entry.id}')">View</button>
+          <button class="btn primary" onclick="approveKyc('${entry.id}')">Approve</button>
+          <button class="btn danger" onclick="deleteKyc('${entry.id}')">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch(e){ console.error(e); }
+}
+
+async function viewKyc(id){
+  try{
+    const res = await fetch(`${BASE_URL}/api/admin/submissions`, { headers: authHeaders() });
+    if(res.ok){
+      const kyc = await res.json();
+      const entry = kyc.find(k => k.id === id);
+      if(entry){
+        alert('KYC Data:\n\n' + JSON.stringify(entry.payload, null, 2));
+      }
+    }
+  } catch(e){ console.error(e); }
+}
+
+async function approveKyc(id){
+  const note = prompt('Admin note (optional):', 'Approved');
+  try{
+    const res = await fetch(`${BASE_URL}/api/admin/approve`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ id, adminNote: note })
+    });
+    if(res.ok){
+      alert('KYC approved');
+      refreshKyc();
+      loadStats();
+    } else {
+      alert('Failed to approve');
+    }
+  } catch(e){ alert('Error: ' + e.message); }
+}
+
+async function deleteKyc(id){
+  if(!confirm('Delete this KYC submission?')) return;
+  try{
+    const res = await fetch(`${BASE_URL}/api/admin/delete`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ id })
+    });
+    if(res.ok){
+      alert('KYC deleted');
+      refreshKyc();
+      loadStats();
+    } else {
+      alert('Failed to delete');
+    }
+  } catch(e){ alert('Error: ' + e.message); }
+}
+
+// Check if already logged in (from index.html or previous session)
+const role = localStorage.getItem('role');
+const adminToken = localStorage.getItem('admin_token');
+
+if(role === 'admin' && adminToken){ 
+  console.log('✅ Auto-login: Admin session from index.html');
+  // Bypass backend login - directly show dashboard
+  const loginEl = document.getElementById('loginScreen');
+  const dashEl = document.getElementById('dashboard');
+  if(loginEl) { loginEl.classList.add('hidden'); loginEl.style.display='none'; }
+  if(dashEl)  { dashEl.classList.remove('hidden'); dashEl.style.display='block'; }
+  loadStats();
+  loadFeatures();
+  loadKycSubmissions();
+} else if(getToken()){ 
+  console.log('✅ Auto-login: Backend session active');
+  showDashboard(); 
+} else {
+  console.log('⚠️ No session - showing login screen');
+  const loginEl = document.getElementById('loginScreen');
+  if(loginEl){ loginEl.classList.remove('hidden'); loginEl.style.display='block'; }
+  const dashEl = document.getElementById('dashboard');
+  if(dashEl){ dashEl.classList.add('hidden'); dashEl.style.display='none'; }
+}
+</script>
+</body>
+</html>

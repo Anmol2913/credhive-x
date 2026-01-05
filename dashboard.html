@@ -1,0 +1,1030 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dashboard - CredHive X</title>
+<meta name="description" content="Your CredHive X dashboard" />
+
+<link rel="stylesheet" href="auth-firebase.css" />
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+    background: linear-gradient(180deg, #fcfeff 0%, #f0f7ff 50%, #f0fff4 100%);
+    color: #132028;
+    min-height: 100vh;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 28px;
+    border-bottom: 1px solid #e6edf3;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(16, 24, 40, 0.06);
+  }
+
+  .logo-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ff6b00, #ff8533);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+
+  .brand-text h1 {
+    font-size: 18px;
+    font-weight: 900;
+  }
+
+  .brand-text p {
+    font-size: 12px;
+    color: #657281;
+  }
+
+  nav {
+    display: flex;
+    gap: 20px;
+  }
+
+  nav a {
+    color: #657281;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+
+  nav a:hover {
+    color: #ff6b00;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 28px;
+  }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  .stat-card {
+    background: #fff;
+    border: 1px solid #e6edf3;
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(16, 24, 40, 0.04);
+    transition: all 0.3s;
+  }
+
+  .stat-card:hover {
+    border-color: #ff6b00;
+    box-shadow: 0 8px 24px rgba(255, 107, 0, 0.1);
+  }
+
+  .stat-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+
+  .stat-value {
+    font-size: 28px;
+    font-weight: 900;
+    color: #ff6b00;
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 14px;
+    color: #657281;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid #e6edf3;
+    border-radius: 14px;
+    padding: 32px;
+    box-shadow: 0 4px 12px rgba(16, 24, 40, 0.04);
+    margin-bottom: 24px;
+  }
+
+  .card h2 {
+    font-size: 24px;
+    font-weight: 900;
+    margin-bottom: 20px;
+    color: #132028;
+  }
+
+  .card p {
+    color: #657281;
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #ff6b00, #ff8533);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 107, 0, 0.2);
+  }
+
+  .user-info {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, rgba(255, 107, 0, 0.05), rgba(255, 133, 51, 0.05));
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #ffd699;
+  }
+
+  .user-avatar {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #ff6b00, #ff8533);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 32px;
+    flex-shrink: 0;
+  }
+
+  .user-details h3 {
+    font-size: 20px;
+    font-weight: 900;
+    margin-bottom: 4px;
+  }
+
+  .user-details p {
+    font-size: 14px;
+    color: #657281;
+    margin-bottom: 8px;
+  }
+
+  .badge {
+    display: inline-block;
+    background: #10b981;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .quick-links {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .quick-link {
+    background: #f9fbfc;
+    border: 1px solid #e6edf3;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: #132028;
+  }
+
+  .quick-link:hover {
+    border-color: #ff6b00;
+    background: #fffbf8;
+  }
+
+  .quick-link-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+
+  .quick-link-title {
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .notification {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(96, 165, 250, 0.1));
+    border-left: 4px solid #3b82f6;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+
+  /* Founder/Chairman Message Section - Premium Design */
+  .founder-message-section {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f7f4 100%);
+    border: 1px solid #e0dcd5;
+    border-radius: 18px;
+    padding: 70px 80px;
+    margin: 80px auto;
+    max-width: 1200px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 0 1px rgba(204, 85, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .founder-message-section::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #CC5500, #E67E22, #CC5500);
+    background-size: 200% 100%;
+  }
+
+  .founder-message-section::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(204, 85, 0, 0.05), transparent 70%);
+    border-radius: 50%;
+    transform: translateY(-50%);
+  }
+
+  .founder-container {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 100px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .founder-image-wrapper {
+    position: relative;
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    padding: 12px;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px rgba(44, 62, 80, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.4s ease;
+  }
+
+  .founder-image-wrapper:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 35px 70px rgba(44, 62, 80, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .founder-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: grayscale(100%) contrast(1.15) brightness(1.05);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transition: all 0.5s cubic-bezier(0.2, 0.9, 0.3, 1);
+  }
+
+  .founder-image-wrapper:hover .founder-image {
+    filter: grayscale(0%) contrast(1) brightness(1);
+  }
+
+  .founder-content {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding: 0;
+  }
+
+  .message-header {
+    border: none;
+    padding: 0;
+    margin-bottom: 0;
+    text-align: center;
+  }
+
+  .message-title {
+    font-size: 24px;
+    font-weight: 900;
+    color: #CC5500;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin: 0 0 24px;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    position: relative;
+    display: block;
+  }
+
+  .message-title::after {
+    content: '';
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #CC5500, transparent);
+    border-radius: 2px;
+  }
+
+  .message-body {
+    padding: 40px 0 0 0;
+    margin: 0;
+  }
+
+  .message-text {
+    font-size: 18px;
+    line-height: 2;
+    color: #3a4a5c;
+    margin-bottom: 28px;
+    font-style: italic;
+    position: relative;
+    padding-left: 0;
+    opacity: 0.95;
+    font-family: 'Segoe UI', Georgia, serif;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+  }
+
+  .message-text:first-letter {
+    font-size: 1.1em;
+  }
+
+  .message-text:first-child::before {
+    display: none;
+  }
+
+  .founder-signature {
+    margin-top: 40px;
+    padding-top: 40px;
+    border-top: 2px solid #e0dcd5;
+    position: relative;
+  }
+
+  .founder-signature::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: linear-gradient(90deg, #CC5500, transparent);
+    border-radius: 1px;
+  }
+
+  .founder-name {
+    font-size: 28px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 10px;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    letter-spacing: -1px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .founder-social-inline {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .founder-social-inline a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: #f0f0f0;
+    border-radius: 6px;
+    color: #CC5500;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+
+  .founder-social-inline a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(204, 85, 0, 0.3);
+  }
+
+  .founder-social-inline a.linkedin:hover {
+    background: #0077B5;
+    color: #fff;
+  }
+
+  .founder-social-inline a.twitter:hover {
+    background: #000000;
+    color: #fff;
+  }
+
+  .founder-designation {
+    font-size: 13px;
+    font-weight: 700;
+    color: #CC5500;
+    margin: 0 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    display: block;
+  }
+
+  .founder-company {
+    font-size: 14px;
+    font-weight: 500;
+    color: #657281;
+    margin: 0;
+    letter-spacing: 0.5px;
+    display: block;
+  }
+
+  .brand-highlight {
+    background: linear-gradient(135deg, rgba(204, 85, 0, 0.12), rgba(230, 126, 34, 0.08));
+    color: #CC5500;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 10px;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(204, 85, 0, 0.2);
+  }
+
+  .brand-logo {
+    width: 24px;
+    height: 24px;
+    background: #FF6B00;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .brand-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .brand-highlight:hover {
+    background: linear-gradient(135deg, rgba(204, 85, 0, 0.2), rgba(230, 126, 34, 0.15));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(204, 85, 0, 0.15);
+    border-color: rgba(204, 85, 0, 0.4);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .brand-highlight {
+      background: linear-gradient(135deg, rgba(204, 85, 0, 0.25), rgba(230, 126, 34, 0.15));
+      border-color: rgba(230, 126, 34, 0.3);
+    }
+
+    .brand-highlight:hover {
+      box-shadow: 0 8px 16px rgba(230, 126, 34, 0.2);
+    }
+  }
+
+  /* Founder Footer */
+  .founder-footer {
+    background: #ffffff;
+    border-top: 1px solid #e0dcd5;
+    padding: 28px 40px;
+    margin-top: 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 40px;
+    font-size: 9pt;
+    color: #657281;
+    text-align: center;
+  }
+
+  .founder-footer-left {
+    text-align: left;
+  }
+
+  .founder-footer-right {
+    text-align: right;
+  }
+
+  .footer-label {
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 6px;
+    font-size: 10pt;
+    display: block;
+    letter-spacing: 0.5px;
+  }
+
+  .footer-value {
+    font-size: 9pt;
+    line-height: 1.6;
+    color: #657281;
+  }
+
+  .footer-value a {
+    color: #CC5500;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .footer-value a:hover {
+    color: #E67E22;
+    text-decoration: underline;
+  }
+
+  .footer-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: #CC5500;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 10px;
+    margin-right: 6px;
+    font-weight: bold;
+  }
+
+  .social-links {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+
+  .social-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: #f0f0f0;
+    border-radius: 6px;
+    color: #CC5500;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+
+  .social-links a:hover {
+    background: #CC5500;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(204, 85, 0, 0.3);
+  }
+
+  .social-links a.linkedin:hover {
+    background: #0077B5;
+  }
+
+  .social-links a.twitter:hover {
+    background: #000000;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .founder-footer {
+      background: #1a1d28;
+      border-top-color: #2d3139;
+    }
+
+    .footer-label {
+      color: #e5e7eb;
+    }
+
+    .footer-value {
+      color: #d1d5db;
+    }
+
+    .footer-icon {
+      background: #CC5500;
+    }
+
+    .social-links a {
+      background: rgba(204, 85, 0, 0.2);
+      color: #E67E22;
+    }
+
+    .social-links a:hover {
+      background: #CC5500;
+      color: #fff;
+    }
+  }
+
+  @media (max-width: 980px) {
+    .founder-footer {
+      grid-template-columns: 1fr;
+      gap: 24px;
+      text-align: center;
+    }
+
+    .founder-footer-left {
+      text-align: center;
+    }
+
+    .founder-footer-right {
+      text-align: center;
+    }
+
+    .social-links {
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 980px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .quick-links {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .founder-container {
+      grid-template-columns: 1fr;
+      gap: 60px;
+    }
+    .founder-image-wrapper {
+      max-width: 340px;
+      margin: 0 auto;
+    }
+    .founder-message-section {
+      padding: 60px 50px;
+      margin: 60px auto;
+    }
+  }
+
+  @media (max-width: 640px) {
+    header {
+      flex-direction: column;
+      gap: 16px;
+      padding: 16px;
+    }
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+    .quick-links {
+      grid-template-columns: 1fr;
+    }
+    .user-info {
+      flex-direction: column;
+      text-align: center;
+    }
+    .founder-message-section {
+      padding: 50px 24px;
+      margin: 50px auto;
+    }
+    .founder-container {
+      gap: 40px;
+    }
+    .message-title {
+      font-size: 18px;
+      letter-spacing: 3px;
+    }
+    .message-text {
+      font-size: 16px;
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+    .founder-name {
+      font-size: 24px;
+    }
+    .founder-image-wrapper {
+      max-width: 280px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="logo-section">
+    <div class="logo">💼</div>
+    <div class="brand-text">
+      <h1>CredHive X</h1>
+      <p>Dashboard</p>
+    </div>
+  </div>
+  <nav>
+    <a href="index.html">← Back to Home</a>
+    <span id="accountSlot"></span>
+  </nav>
+</header>
+
+<!-- Main Content -->
+<div class="container">
+  <!-- User Info -->
+  <div id="userSection" style="display: none;">
+    <div class="user-info">
+      <div class="user-avatar" id="userAvatar">👤</div>
+      <div class="user-details">
+        <h3 id="userName">Loading...</h3>
+        <p id="userEmail"></p>
+        <span class="badge" id="userAuthMethod">Email Auth</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="dashboard-grid">
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-value">—</div>
+      <div class="stat-label">Total Payments</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📋</div>
+      <div class="stat-value">—</div>
+      <div class="stat-label">Active Plans</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-value">—</div>
+      <div class="stat-label">Completed</div>
+    </div>
+  </div>
+
+  <!-- Welcome Card -->
+  <div class="card">
+    <h2>👋 Welcome to Your Dashboard</h2>
+    <p>You're now logged into CredHive X. Here's what you can do:</p>
+    <div class="quick-links">
+      <a href="main-interface.html" class="quick-link">
+        <div class="quick-link-icon">💰</div>
+        <div class="quick-link-title">Calculate Payment</div>
+      </a>
+      <a href="step-2-details.html" class="quick-link">
+        <div class="quick-link-icon">📋</div>
+        <div class="quick-link-title">See Options</div>
+      </a>
+      <a href="step-3-details.html" class="quick-link">
+        <div class="quick-link-icon">✅</div>
+        <div class="quick-link-title">Verify Setup</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Getting Started -->
+  <div class="card">
+    <h2>🚀 Getting Started</h2>
+    <div class="notification">
+      <strong>📢 Pro Tip:</strong> Complete your profile to unlock all features and get personalized recommendations.
+    </div>
+    <p><strong>Step 1:</strong> Calculate your payment size</p>
+    <p>Tell us how much you want to split and for how many months.</p>
+    <p style="margin-bottom: 20px;"><strong>Step 2:</strong> Compare payment options</p>
+    <p>Browse plans from SBI, HDFC, Bajaj, and ICICI.</p>
+    <p style="margin-bottom: 20px;"><strong>Step 3:</strong> Complete verification</p>
+    <p>Upload required documents and get approved in 5 minutes.</p>
+    <a href="index.html" class="btn">👉 Start Now</a>
+  </div>
+
+  <!-- Support Card -->
+  <div class="card">
+    <h2>❓ Need Help?</h2>
+    <p>Have questions about your payments or account?</p>
+    <p>Our support team is here to help you 24/7. Contact us anytime.</p>
+    <a href="mailto:support@credhivx.com" class="btn">📧 Contact Support</a>
+  </div>
+
+  <!-- Founder/Chairman Message Section -->
+  <div class="founder-message-section">
+    <div class="founder-container">
+      <div class="founder-image-wrapper">
+        <img src="founder-photo.jpg" alt="Anmol - Founder & Chairman" class="founder-image" />
+      </div>
+      <div class="founder-content">
+        <div class="message-header">
+          <h2 class="message-title">A Note from Anmol</h2>
+        </div>
+        <div class="message-body">
+          <p class="message-text">
+            At <span class="brand-highlight"><span class="brand-logo"><img src="logo.svg" alt="CredHive X"></span>CredHive X</span>, our vision is to simplify credit access through transparent, technology-driven financial solutions.
+          </p>
+          <p class="message-text">
+            This platform is designed to demonstrate responsible credit assessment, secure data handling, and user-centric financial experiences through a structured FinTech workflow.
+          </p>
+          <p class="message-text">
+            Our goal is to build systems that promote financial awareness, trust, and long-term value for users.
+          </p>
+        </div>
+        <div class="founder-signature">
+          <p class="founder-name">
+            <span>Anmol</span>
+            <span class="founder-social-inline">
+              <a href="https://linkedin.com/in/anmol1307" target="_blank" rel="noopener noreferrer" class="linkedin" title="LinkedIn">in</a>
+              <a href="https://x.com/Anmol2906" target="_blank" rel="noopener noreferrer" class="twitter" title="Twitter / X">𝕏</a>
+            </span>
+          </p>
+          <p class="founder-designation">Founder & Chairman</p>
+          <p class="founder-company"><span class="brand-highlight"><span class="brand-logo"><img src="logo.svg" alt="CredHive X"></span>CredHive X</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Founder Footer -->
+  <div class="founder-footer">
+    <div class="founder-footer-left">
+      <span class="footer-label">📍 Registered Office</span>
+      <div class="footer-value">
+        Gurgaon, Haryana<br>
+        Pincode: 122002
+      </div>
+    </div>
+    
+    <div>
+      <span class="footer-label">📧 Get in Touch</span>
+      <div class="footer-value">
+        <a href="mailto:anmol032@credhivex.co">anmol032@credhivex.co</a><br>
+        <a href="http://www.credhivex.com" target="_blank">www.credhivex.com</a>
+      </div>
+    </div>
+    
+    <div class="founder-footer-right">
+      <span class="footer-label">🔗 Connect With Us</span>
+      <div class="footer-value" style="margin-bottom:10px">
+        <span class="footer-icon">C</span> CIN: U65999DL2024PTC398247
+      </div>
+      <div class="social-links">
+        <a href="https://linkedin.com/in/anmol1307" target="_blank" rel="noopener noreferrer" class="linkedin" title="LinkedIn">in</a>
+        <a href="https://x.com/Anmol2906" target="_blank" rel="noopener noreferrer" class="twitter" title="Twitter / X">𝕏</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase Scripts -->
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+<script>
+  // Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyC_example_key_replace_with_your_own",
+    authDomain: "your-project.firebaseapp.com",
+    projectId: "your-project-id",
+    storageBucket: "your-project.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "1:123456789:web:abc123def456ghi789jkl"
+  };
+  
+  try {
+    firebase.initializeApp(firebaseConfig);
+    window.firebase_app = firebase.app();
+  } catch (e) {
+    console.warn('Firebase config missing');
+  }
+</script>
+<script src="auth-firebase.js"></script>
+
+<script>
+  window.addEventListener('load', () => {
+    const user = Auth.getCurrentUser();
+    if (!user) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    // Populate user info
+    const userSection = document.getElementById('userSection');
+    const userName = document.getElementById('userName');
+    const userEmail = document.getElementById('userEmail');
+    const userAvatar = document.getElementById('userAvatar');
+    const userAuthMethod = document.getElementById('userAuthMethod');
+
+    userName.textContent = user.displayName || 'User';
+    userEmail.textContent = user.email;
+    
+    const initials = (user.displayName || 'U')
+      .split(/\s+/)
+      .map(n => n[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
+    
+    userAvatar.textContent = initials;
+    
+    const authMethod = localStorage.getItem('auth_method') || 'email';
+    userAuthMethod.textContent = authMethod === 'google' ? '🔍 Google Auth' : '📧 Email Auth';
+
+    userSection.style.display = 'block';
+
+    // Render account chip in header
+    renderAccountChip(user);
+  });
+
+  // Render the Account/User Details button + menu
+  function renderAccountChip(user){
+    const slot = document.getElementById('accountSlot');
+    if(!slot) return;
+    slot.innerHTML = '';
+    if(!user){
+      const btn = document.createElement('a');
+      btn.className = 'btn';
+      btn.href = 'login.html';
+      btn.textContent = '🔐 Login';
+      slot.appendChild(btn);
+      return;
+    }
+
+    const wrap = document.createElement('div');
+    wrap.style.position = 'relative';
+
+    const chip = document.createElement('button');
+    chip.className = 'btn';
+    chip.style.background = 'linear-gradient(180deg,#ff6b00,#ff8c00)';
+    chip.style.boxShadow = '0 10px 26px rgba(255,107,0,0.22)';
+    chip.style.border = 'none';
+    chip.innerHTML = '👤 Account';
+
+    const menu = document.createElement('div');
+    menu.style.position = 'absolute';
+    menu.style.top = '110%';
+    menu.style.right = '0';
+    menu.style.background = '#fff';
+    menu.style.border = '1px solid #e6edf3';
+    menu.style.borderRadius = '12px';
+    menu.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)';
+    menu.style.minWidth = '220px';
+    menu.style.display = 'none';
+
+    const profile = document.createElement('div');
+    profile.style.padding = '12px 14px';
+    profile.style.borderBottom = '1px solid #e6edf3';
+    profile.innerHTML = `<strong>${user.displayName || user.name || 'User'}</strong><br/><span style="color:#657281;font-size:13px">${user.email || 'No email'}</span>`;
+
+    const idRow = document.createElement('div');
+    idRow.style.padding = '10px 14px';
+    idRow.style.fontSize = '12px';
+    idRow.style.color = '#657281';
+    idRow.textContent = `ID: ${user.uid || user.email || 'N/A'}`;
+
+    const logoutBtn = document.createElement('button');
+    logoutBtn.style.width = '100%';
+    logoutBtn.style.padding = '12px 14px';
+    logoutBtn.style.border = 'none';
+    logoutBtn.style.background = 'transparent';
+    logoutBtn.style.cursor = 'pointer';
+    logoutBtn.style.color = '#ef4444';
+    logoutBtn.style.fontWeight = '700';
+    logoutBtn.textContent = '🚪 Logout';
+    logoutBtn.addEventListener('click', async ()=>{
+      await Auth.logout();
+      window.location.href = 'login.html';
+    });
+
+    menu.appendChild(profile);
+    menu.appendChild(idRow);
+    menu.appendChild(logoutBtn);
+
+    chip.addEventListener('click', ()=>{
+      menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    });
+    document.addEventListener('click', (e)=>{
+      if(!wrap.contains(e.target)) menu.style.display = 'none';
+    });
+
+    wrap.appendChild(chip);
+    wrap.appendChild(menu);
+    slot.appendChild(wrap);
+  }
+
+  // Keep header in sync if auth state changes elsewhere
+  window.addEventListener('authStateChanged', (e)=>{
+    renderAccountChip(e.detail.user);
+  });
+</script>
+
+</body>
+</html>

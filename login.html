@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Login - CredHive X</title>
+<meta name="description" content="Login to CredHive X and access your payment plans" />
+
+<link rel="stylesheet" href="auth-firebase.css" />
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; }
+  body {
+    font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+    background: linear-gradient(135deg, #fcfeff 0%, #f0f7ff 50%, #f0fff4 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  
+  .login-wrapper {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .back-link {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 24px;
+    color: var(--auth-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+
+  .back-link:hover {
+    gap: 10px;
+  }
+
+  .logo-center {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .logo-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #ff6b00, #ff8533);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    margin: 0 auto 16px;
+    box-shadow: 0 8px 24px rgba(255, 107, 0, 0.2);
+  }
+
+  .logo-text h2 {
+    font-size: 24px;
+    font-weight: 900;
+    color: #132028;
+    margin-bottom: 4px;
+  }
+
+  .logo-text p {
+    font-size: 14px;
+    color: #657281;
+  }
+
+  .form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .social-login {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .social-btn {
+    padding: 12px;
+    border: 1px solid var(--auth-border);
+    border-radius: 10px;
+    background: var(--auth-card);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s var(--auth-ease);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .social-btn:hover {
+    border-color: var(--auth-primary);
+    background: #fafafa;
+  }
+
+  .social-btn:active {
+    transform: scale(0.98);
+  }
+
+  .error-msg {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid #ef4444;
+    color: #7f1d1d;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    display: none;
+  }
+
+  .success-msg {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid #10b981;
+    color: #065f46;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    display: none;
+  }
+
+  .signup-link {
+    text-align: center;
+    font-size: 14px;
+    color: #657281;
+  }
+
+  .signup-link a {
+    color: var(--auth-primary);
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .signup-link a:hover {
+    text-decoration: underline;
+  }
+
+  .password-input-wrapper {
+    position: relative;
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--auth-muted);
+    transition: color 0.2s;
+  }
+
+  .toggle-password:hover {
+    color: var(--auth-primary);
+  }
+
+  .loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 107, 0, 0.3);
+    border-top-color: #ff6b00;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 480px) {
+    .logo-text h2 { font-size: 20px; }
+    .login-wrapper { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="login-wrapper">
+  <a href="index.html" class="back-link">← Back to Home</a>
+
+  <div class="logo-center">
+    <div class="logo-icon">🔐</div>
+    <div class="logo-text">
+      <h2>CredHive X</h2>
+      <p>Login to your account</p>
+    </div>
+  </div>
+
+  <div class="auth-card">
+    <div class="form-section">
+      <!-- Messages -->
+      <div id="errorMsg" class="error-msg"></div>
+      <div id="successMsg" class="success-msg"></div>
+
+      <!-- Google Login -->
+      <div>
+        <button type="button" id="googleLoginBtn" class="social-btn" style="width: 100%; gap: 12px;">
+          <span>🔍</span>
+          <span>Continue with Google</span>
+        </button>
+      </div>
+
+      <!-- Divider -->
+      <div class="auth-divider">
+        <span>or</span>
+      </div>
+
+      <!-- Email/Password Form -->
+      <form id="loginForm" style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="auth-field">
+          <label for="email">Email Address</label>
+          <input 
+            id="email" 
+            type="email" 
+            placeholder="you@example.com" 
+            autocomplete="email"
+            required 
+          />
+        </div>
+
+        <div class="auth-field">
+          <label for="password">Password</label>
+          <div class="password-input-wrapper">
+            <input 
+              id="password" 
+              type="password" 
+              placeholder="••••••••" 
+              autocomplete="current-password"
+              required 
+            />
+            <button type="button" class="toggle-password" id="togglePassword">👁️</button>
+          </div>
+        </div>
+
+        <label class="auth-checkbox">
+          <input type="checkbox" id="rememberMe" />
+          <span>Remember me</span>
+        </label>
+
+        <button type="submit" class="btn-primary" style="width: 100%; gap: 10px;">
+          <span id="btnText">🚀 Login</span>
+        </button>
+      </form>
+
+      <!-- Signup Link -->
+      <div class="signup-link">
+        Don't have an account? <a href="signup.html">Sign up here</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #657281;">
+    By logging in, you agree to our <a href="terms.html#privacy" style="color: #ff6b00; text-decoration: none;">Privacy Policy</a>
+  </div>
+</div>
+
+<!-- Simple Auth System -->
+<script src="auth.js"></script>
+
+<script>
+  // Wait for Auth to be available
+  function waitForAuth() {
+    return new Promise((resolve) => {
+      if (window.Auth) {
+        resolve();
+      } else {
+        setTimeout(() => waitForAuth().then(resolve), 100);
+      }
+    });
+  }
+
+  waitForAuth().then(() => {
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const rememberCheckbox = document.getElementById('rememberMe');
+    const loginForm = document.getElementById('loginForm');
+    const googleLoginBtn = document.getElementById('googleLoginBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    const successMsg = document.getElementById('successMsg');
+    const btnText = document.getElementById('btnText');
+
+    // Password toggle
+    togglePasswordBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const isPassword = passwordInput.type === 'password';
+      passwordInput.type = isPassword ? 'text' : 'password';
+      togglePasswordBtn.textContent = isPassword ? '👁️‍🗨️' : '👁️';
+    });
+
+  // Load remembered email
+  window.addEventListener('load', () => {
+    const remembered = localStorage.getItem('auth_remembered_email');
+    if (remembered) {
+      emailInput.value = remembered;
+      rememberCheckbox.checked = true;
+    }
+  });
+
+  // Email/Password Login
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    if (!email || !password) {
+      showError('Please enter email and password');
+      return;
+    }
+
+    try {
+      showLoading();
+      
+      // Use the simple auth system from auth.js
+      const user = await Auth.login({ email, password });
+      
+      // Save remembered email
+      if (rememberCheckbox.checked) {
+        localStorage.setItem('auth_remembered_email', email);
+      } else {
+        localStorage.removeItem('auth_remembered_email');
+      }
+
+      showSuccess('✅ Login successful! Redirecting...');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 800);
+    } catch (error) {
+      showError(error.message || 'Login failed');
+      btnText.textContent = '🚀 Login';
+    }
+  });
+
+  // Google Login - disabled for now
+  googleLoginBtn.addEventListener('click', async () => {
+    showError('Google login not configured. Please use email/password.');
+  });
+
+  function showError(message) {
+    errorMsg.textContent = '❌ ' + message;
+    errorMsg.style.display = 'block';
+    successMsg.style.display = 'none';
+    btnText.textContent = '🚀 Login';
+    googleLoginBtn.disabled = false;
+    setTimeout(() => errorMsg.style.display = 'none', 5000);
+  }
+
+  function showSuccess(message) {
+    successMsg.textContent = message;
+    successMsg.style.display = 'block';
+    errorMsg.style.display = 'none';
+  }
+
+  function showLoading() {
+    btnText.innerHTML = '<span class="loading"></span> Logging in...';
+    googleLoginBtn.disabled = true;
+  }
+
+  // Redirect if already logged in
+  if (Auth && Auth.current && Auth.current()) {
+    window.location.href = 'index.html';
+  }
+  
+  }); // Close waitForAuth
+</script>
+
+</body>
+</html>
