@@ -1,0 +1,29 @@
+<svg viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+  <!-- 3D Hexagon Base (Dark Blue Bottom) -->
+  <path d="M 140 200 L 65 160 L 65 100 L 140 60 L 215 100 L 215 160 Z" fill="#1a4d7a" opacity="0.9"/>
+  
+  <!-- 3D Hexagon (Blue Main) -->
+  <path d="M 140 190 L 70 155 L 70 105 L 140 70 L 210 105 L 210 155 Z" fill="#2563eb"/>
+  
+  <!-- Hexagon Top (Orange/Gold) -->
+  <path d="M 140 70 L 210 105 L 210 155 L 140 190 L 70 155 L 70 105 Z" fill="url(#goldGradient)"/>
+  
+  <!-- Cyan/Blue X Stroke 1 -->
+  <path d="M 95 105 L 185 155" stroke="#00d9ff" stroke-width="18" stroke-linecap="round" fill="none"/>
+  
+  <!-- Cyan/Blue X Stroke 2 -->
+  <path d="M 185 105 L 95 155" stroke="#0ea5e9" stroke-width="18" stroke-linecap="round" fill="none"/>
+  
+  <!-- Gold highlights -->
+  <path d="M 140 70 L 210 105 L 175 125" fill="#fbbf24" opacity="0.7"/>
+  <path d="M 70 105 L 105 125 L 70 155" fill="#d97706" opacity="0.6"/>
+  
+  <!-- Gradients -->
+  <defs>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:0.9" />
+      <stop offset="50%" style="stop-color:#f59e0b;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#d97706;stop-opacity:0.7" />
+    </linearGradient>
+  </defs>
+</svg>
