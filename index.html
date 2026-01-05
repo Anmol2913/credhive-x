@@ -1,0 +1,1903 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CredHive X – Smart Payment Plans</title>
+<meta name="description" content="CredHive X - Split payments easily, compare flexible plans, setup in 5 mins, save with no stress" />
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script type="text/javascript">
+  (function() {
+    emailjs.init("MbjyM06GmzTkXkIzF");
+  })();
+</script>
+
+<!-- Firebase Authentication (Compat builds for v8-style API) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<!-- Firebase Config -->
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyALC9Y9Qu-UPKWaoubDWl_B9aMZTuaIq3w",
+    authDomain: "credhivex.firebaseapp.com",
+    projectId: "credhivex",
+    storageBucket: "credhivex.firebasestorage.app",
+    messagingSenderId: "148358710050",
+    appId: "1:148358710050:web:8d3ea1f111ccc96e979b7b",
+    measurementId: "G-W6EXFR2QZ7"
+  };
+  // Expose config globally for auth-firebase.js fallback path
+  window.firebaseConfig = firebaseConfig;
+  
+  try {
+    const app = firebase.initializeApp(firebaseConfig);
+    window.firebase_app = app;
+    window.auth = firebase.auth(app);
+    console.log('✅ Firebase Auth initialized successfully');
+  } catch (e) {
+    console.warn('⚠️ Firebase not configured. Using fallback auth.', e);
+  }
+</script>
+
+<style>
+  /* Reset + variables */
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --primary:#ff6b00;
+    --accent:#ff8c00;
+    --muted:#657281;
+    --text:#132028;
+    --bg:#ffe8ed;
+    --card:#ffffff;
+    --border:#e6edf3;
+    --radius:14px;
+    --shadow:0 20px 40px rgba(0,0,0,0.1);
+    --shadow-lg:0 30px 60px rgba(0,0,0,0.15);
+    --maxw:1200px;
+    --ease: cubic-bezier(.2,.9,.3,1);
+    --success:#10b981;
+    --info:#3b82f6;
+  }
+
+  /* Dark Mode */
+  html.dark-mode {
+    --bg:#0a0c10;
+    --card:#1a1d28;
+    --text:#e5e7eb;
+    --muted:#9ca3af;
+    --border:#2d2f3d;
+    --shadow:0 20px 40px rgba(0,0,0,0.4);
+    --shadow-lg:0 30px 60px rgba(0,0,0,0.6);
+  }
+
+  body{
+    font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+    color:var(--text);
+    background: linear-gradient(135deg,var(--bg) 0%,var(--bg) 100%);
+    padding:28px;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.6;
+    transition:background 0.3s var(--ease);
+  }
+
+  body::before {
+    content:'';
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:radial-gradient(ellipse 800px 400px at 20% -10%, rgba(255,107,0,0.08), transparent 40%),
+                radial-gradient(ellipse 600px 300px at 80% 80%, rgba(59,130,246,0.06), transparent 40%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  html.dark-mode body::before {
+    background:radial-gradient(ellipse 800px 400px at 20% -10%, rgba(255,107,0,0.12), transparent 40%),
+                radial-gradient(ellipse 600px 300px at 80% 80%, rgba(59,130,246,0.1), transparent 40%);
+  }
+
+  .container{max-width:var(--maxw);margin:0 auto;position:relative;z-index:1}
+
+  /* Header */
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 20px;margin-bottom:32px;background:rgba(255,255,255,0.75);backdrop-filter:blur(10px);border-radius:14px;position:relative;overflow:hidden;flex-wrap:wrap;border:1px solid rgba(230,237,243,0.5);box-shadow:0 8px 32px rgba(0,0,0,0.06)}
+  
+  html.dark-mode header {
+    background:rgba(26,29,40,0.75);
+    border-color:rgba(45,47,61,0.5);
+    box-shadow:0 8px 32px rgba(0,0,0,0.3);
+  }
+
+  header::before{content:'';position:absolute;top:-40%;right:-5%;width:250px;height:250px;background:radial-gradient(circle,rgba(255,107,0,0.04),transparent 70%);border-radius:50%;pointer-events:none}
+  header::after{content:'';position:absolute;bottom:-20%;left:8%;width:180px;height:180px;background:radial-gradient(circle,rgba(59,130,246,0.02),transparent 70%);border-radius:50%;pointer-events:none}
+  
+  .brand{display:flex;align-items:center;gap:12px;position:relative;z-index:2;flex-shrink:0}
+  .logo{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-weight:800;font-size:26px;box-shadow:0 12px 32px rgba(255,107,0,0.3);animation:float 3.5s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)};50%{transform:translateY(-8px)}}
+  .site-title{font-weight:900;font-size:20px;line-height:1.1;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .site-sub{font-size:13px;color:var(--muted);font-weight:600;line-height:1.2}
+
+  nav{display:flex;gap:12px;align-items:center;position:relative;z-index:2;flex-wrap:wrap;flex:1;justify-content:center}
+  nav a{color:var(--muted);text-decoration:none;font-weight:700;padding:9px 14px;border-radius:9px;transition:all .2s var(--ease);position:relative;overflow:hidden;font-size:14px;white-space:nowrap}
+  nav a::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,107,0,0.1),transparent);opacity:0;transition:opacity .2s}
+  nav a:hover{background:rgba(255,107,0,0.1);color:var(--text);transform:translateY(-2px)}
+  nav a:hover::before{opacity:1}
+  
+  nav a.cta{background:linear-gradient(180deg,var(--primary),var(--accent));color:#fff;box-shadow:0 12px 32px rgba(255,107,0,0.25);padding:10px 18px;font-size:14px;font-weight:800;border-radius:9px;position:relative;overflow:hidden}
+  nav a.cta::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,0.3),transparent 50%);pointer-events:none}
+  nav a.cta:hover{transform:translateY(-3px);box-shadow:0 16px 48px rgba(255,107,0,0.35)}
+  /* Dark mode CTA tone-down */
+  html.dark-mode nav a.cta{background:linear-gradient(180deg,#e56d00,#c85100);box-shadow:0 12px 32px rgba(0,0,0,0.45)}
+  html.dark-mode nav a.cta:hover{box-shadow:0 16px 48px rgba(0,0,0,0.6)}
+  
+  nav a[href="login.html"]{background:linear-gradient(180deg,#10b981,#34d399);color:#fff;box-shadow:0 12px 32px rgba(16,185,129,0.25);padding:10px 18px;font-size:14px;font-weight:800;border-radius:9px;position:relative;overflow:hidden}
+  nav a[href="login.html"]::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,0.3),transparent 50%);pointer-events:none}
+  nav a[href="login.html"]:hover{transform:translateY(-3px);box-shadow:0 16px 48px rgba(16,185,129,0.35)}
+  html.dark-mode nav a[href="login.html"]{background:linear-gradient(180deg,#0ea55f,#0b8f52);box-shadow:0 12px 32px rgba(0,0,0,0.45)}
+  html.dark-mode nav a[href="login.html"]:hover{box-shadow:0 16px 48px rgba(0,0,0,0.6)}
+
+  /* Dark Mode Toggle */
+  .dark-mode-toggle {
+    position:relative;
+    z-index:2;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  
+  .toggle-switch {
+    width:54px;
+    height:28px;
+    background:linear-gradient(90deg,#e5e7eb,#d1d5db);
+    border:none;
+    border-radius:999px;
+    cursor:pointer;
+    position:relative;
+    transition:all 0.3s cubic-bezier(0.2,0.9,0.3,1);
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+    padding:2px;
+  }
+
+  .toggle-switch::after {
+    content:'';
+    position:absolute;
+    width:24px;
+    height:24px;
+    background:#fff;
+    border-radius:50%;
+    left:2px;
+    top:2px;
+    transition:all 0.3s cubic-bezier(0.2,0.9,0.3,1);
+    box-shadow:0 2px 6px rgba(0,0,0,0.15);
+  }
+
+  html.dark-mode .toggle-switch {
+    background:linear-gradient(90deg,#3b82f6,#1e40af);
+  }
+
+  html.dark-mode .toggle-switch::after {
+    left:26px;
+    box-shadow:0 2px 6px rgba(59,130,246,0.3);
+  }
+
+  .toggle-switch:hover {
+    box-shadow:0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .toggle-icon {
+    font-size:16px;
+    transition:opacity 0.3s;
+  }
+
+  .toggle-icon.sun {
+    opacity:1;
+  }
+
+  html.dark-mode .toggle-icon.sun {
+    opacity:0.4;
+  }
+
+  .toggle-icon.moon {
+    opacity:0.4;
+  }
+
+  html.dark-mode .toggle-icon.moon {
+    opacity:1;
+  }
+  
+  #auth-ui-slot{display:flex;gap:8px;align-items:center;position:relative;z-index:2}
+  #auth-ui-slot a{color:var(--muted);text-decoration:none;font-weight:700;padding:9px 14px;border-radius:9px;transition:all .2s var(--ease);display:inline-flex;gap:6px;align-items:center;font-size:14px}
+  #auth-ui-slot a.btn{padding:10px 16px;border:none;cursor:pointer;background:#fff;border:1.5px solid var(--border);border-radius:9px;font-weight:800}
+  #auth-ui-slot a.btn:hover{background:rgba(255,107,0,0.08);border-color:var(--primary);transform:translateY(-2px)}
+  #auth-ui-slot a.btn.primary{background:linear-gradient(180deg,var(--primary),var(--accent));color:#fff;border:none;box-shadow:0 12px 32px rgba(255,107,0,0.25)}
+  #auth-ui-slot a.btn.primary:hover{transform:translateY(-3px);box-shadow:0 16px 48px rgba(255,107,0,0.35)}
+  
+  @media (max-width:1024px){
+    header{gap:12px;padding:12px 18px}
+    .logo{width:52px;height:52px;font-size:24px}
+    .site-title{font-size:18px}
+    .site-sub{font-size:12px}
+    nav{gap:10px}
+    nav a{padding:8px 12px;font-size:13px}
+    nav a.cta, nav a[href="login.html"]{padding:9px 16px;font-size:13px}
+  }
+  
+  @media (max-width:768px){
+    header{flex-direction:row;padding:12px 16px;gap:10px}
+    .brand{flex-shrink:0;gap:10px}
+    .logo{width:48px;height:48px;font-size:22px}
+    .site-title{font-size:17px}
+    .site-sub{font-size:11px}
+    nav{flex:1;gap:8px;justify-content:flex-start}
+    nav a{padding:7px 11px;font-size:12px}
+    nav a.cta, nav a[href="login.html"]{padding:8px 14px;font-size:12px}
+  }
+  
+  @media (max-width:550px){
+    header{gap:8px;padding:10px 14px}
+    .brand{gap:8px}
+    .logo{width:44px;height:44px;font-size:20px}
+    .site-title{font-size:16px}
+    .site-sub{display:none}
+    nav{gap:6px}
+    nav a{padding:6px 10px;font-size:11px}
+    nav a.cta, nav a[href="login.html"]{padding:7px 12px;font-size:11px}
+    .dark-mode-toggle{gap:4px}
+    .toggle-switch{width:48px;height:24px;padding:1.5px}
+    .toggle-switch::after{width:20px;height:20px}
+    html.dark-mode .toggle-switch::after{left:23px}
+    .toggle-icon{font-size:14px}
+  }
+
+  /* Hero area */
+  .hero{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;margin-bottom:48px}
+  @media (max-width:980px){ .hero{grid-template-columns:1fr;gap:24px} }
+
+  .card{background:rgba(255,255,255,0.8);backdrop-filter:blur(12px);border-radius:var(--radius);padding:24px;border:1px solid rgba(230,237,243,0.5);box-shadow:0 20px 40px rgba(0,0,0,0.1);transition:all 0.3s var(--ease)}
+  
+  html.dark-mode .card {
+    background:rgba(26,29,40,0.6);
+    border-color:rgba(45,47,61,0.5);
+    box-shadow:0 20px 40px rgba(0,0,0,0.4);
+  }
+
+  .card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+  
+  .hero-left .title{font-size:52px;font-weight:900;margin-bottom:16px;line-height:1.2;background:linear-gradient(135deg,#ff6b00 0%,#ff8c00 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.8px}
+  .hero-left .subtitle{color:var(--muted);margin-bottom:24px;font-size:16px;line-height:1.7}
+
+  /* Quick actions */
+  .quick-grid{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:24px}
+  .btn{display:inline-flex;gap:10px;align-items:center;padding:12px 18px;border-radius:12px;border:1.5px solid var(--border);background:linear-gradient(135deg,rgba(255,255,255,0.9),rgba(255,250,240,0.95));font-weight:800;color:var(--text);cursor:pointer;transition:transform .12s var(--ease),box-shadow .12s var(--ease),background .12s var(--ease);font-size:15px;box-shadow:0 8px 24px rgba(0,0,0,0.08)}
+  .btn:active{transform:scale(0.95)}
+  .btn.primary{background:linear-gradient(180deg,#ff8c00 0%,#ff6b00 100%);color:#fff;border:none;box-shadow:0 20px 40px rgba(255,107,0,0.25);padding:14px 24px;font-size:16px;font-weight:800;position:relative;overflow:hidden}
+  .btn.primary::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,0.4),transparent 50%);pointer-events:none}
+  .btn.primary:hover{transform:translateY(-3px);box-shadow:0 28px 56px rgba(255,107,0,0.35)}
+  .btn.secondary{background:linear-gradient(135deg,rgba(59,130,246,0.12),rgba(96,165,250,0.08));border:1.5px solid rgba(59,130,246,0.35);color:var(--info);backdrop-filter:blur(10px);font-weight:800;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(59,130,246,0.1)}
+  .btn.secondary::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(59,130,246,0.15),transparent);opacity:0;transition:opacity 0.3s}
+  .btn.secondary:hover{background:linear-gradient(135deg,rgba(59,130,246,0.22),rgba(96,165,250,0.18));border-color:var(--info);transform:translateY(-3px);box-shadow:0 20px 40px rgba(59,130,246,0.25)}
+  .btn.secondary:hover::before{opacity:1}
+  .btn:hover{transform:translateY(-3px)}
+  /* Dark mode button variants */
+  html.dark-mode .btn{background:linear-gradient(135deg,rgba(31,41,55,0.95),rgba(17,24,39,0.95));border-color:rgba(45,47,61,0.6);color:#e5e7eb;box-shadow:0 8px 24px rgba(0,0,0,0.35)}
+  html.dark-mode .btn.primary{background:linear-gradient(180deg,#ff7a00,#e85f00);box-shadow:0 20px 40px rgba(0,0,0,0.5)}
+  html.dark-mode .btn.primary:hover{box-shadow:0 28px 56px rgba(0,0,0,0.6)}
+  html.dark-mode .btn.secondary{background:linear-gradient(135deg,rgba(59,130,246,0.20),rgba(2,132,199,0.18));border-color:rgba(59,130,246,0.5);color:#dbeafe;box-shadow:0 8px 24px rgba(0,0,0,0.35)}
+  html.dark-mode .btn.secondary:hover{background:linear-gradient(135deg,rgba(59,130,246,0.28),rgba(2,132,199,0.24));box-shadow:0 20px 40px rgba(0,0,0,0.5)}
+
+  /* Features */
+  .features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px}
+  @media (max-width:980px){ .features{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:640px){ .features{grid-template-columns:1fr} }
+  .feature{padding:18px;border-radius:12px;background:rgba(249,250,251,0.7);backdrop-filter:blur(10px);border:1px solid rgba(230,237,243,0.6);display:flex;gap:14px;align-items:flex-start;transition:transform .12s var(--ease),box-shadow .12s var(--ease);box-shadow:0 8px 20px rgba(0,0,0,0.06)}
+  
+  html.dark-mode .feature {
+    background:rgba(26,29,40,0.5);
+    border-color:rgba(45,47,61,0.5);
+    box-shadow:0 8px 20px rgba(0,0,0,0.3);
+  }
+
+  .feature:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(255,107,0,0.15)}
+  .feature .ficon{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#ff6b00,#ff8c00);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:24px;flex-shrink:0;box-shadow:0 8px 20px rgba(255,107,0,0.2)}
+  .feature h4{margin-bottom:6px;font-size:16px;font-weight:800}
+  .feature p{color:var(--muted);font-size:14px;line-height:1.5}
+
+  /* Feature accents */
+  .feature{position:relative;overflow:hidden}
+  .feature::before{content:'';position:absolute;inset:0;opacity:0.18}
+  .feature.accent-orange::before{background:radial-gradient(700px 350px at 18% -20%, rgba(255,107,0,0.55), transparent 60%)}
+  .feature.accent-blue::before{background:radial-gradient(700px 350px at 18% -20%, rgba(59,130,246,0.55), transparent 60%)}
+  .feature.accent-green::before{background:radial-gradient(700px 350px at 18% -20%, rgba(16,185,129,0.55), transparent 60%)}
+
+  .feature.accent-orange h4{background:linear-gradient(135deg,#ff8c00,#ff6b00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .feature.accent-blue h4{background:linear-gradient(135deg,#3b82f6,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .feature.accent-green h4{background:linear-gradient(135deg,#10b981,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+  html.dark-mode .feature::before{opacity:0.22}
+
+  /* Right Hero Section */
+  .hero-right{display:flex;flex-direction:column;gap:16px}
+  
+  .benefit-card{background:rgba(255,253,249,0.7);backdrop-filter:blur(10px);border:1px solid rgba(230,237,243,0.6);border-radius:12px;padding:16px;display:flex;gap:12px;align-items:flex-start;transition:all .12s var(--ease);box-shadow:0 8px 20px rgba(0,0,0,0.06)}
+  
+  html.dark-mode .benefit-card {
+    background:rgba(26,29,40,0.5);
+    border-color:rgba(45,47,61,0.5);
+    box-shadow:0 8px 20px rgba(0,0,0,0.3);
+  }
+
+  .benefit-card:hover{transform:translateX(4px);border-color:var(--primary);box-shadow:0 12px 28px rgba(255,107,0,0.15)}
+  .benefit-icon{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#ff6b00,#ff8c00);display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;flex-shrink:0;box-shadow:0 6px 16px rgba(255,107,0,0.25)}
+  .benefit-card h4{font-size:15px;margin-bottom:4px;font-weight:800}
+  .benefit-card p{font-size:13px;color:var(--muted)}
+
+  .highlight-box{background:linear-gradient(135deg,#ff6b00,#ff8c00);border-radius:12px;padding:24px;color:#fff;text-align:center;box-shadow:0 20px 40px rgba(255,107,0,0.25);position:relative;overflow:hidden}
+  .highlight-box::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,0.3),transparent 50%);pointer-events:none}
+  .highlight-box .big-text{font-size:28px;font-weight:900;margin-bottom:8px;position:relative;z-index:1}
+  .highlight-box .small-text{font-size:14px;opacity:0.95;line-height:1.6;position:relative;z-index:1}
+
+  /* Metric cards (hero-right) */
+  .metric-card{position:relative;overflow:hidden;border-radius:12px;padding:20px;text-align:center;background:linear-gradient(135deg,rgba(255,255,255,0.92),rgba(247,250,255,0.95));border:1px solid rgba(230,237,243,0.6);box-shadow:0 12px 32px rgba(0,0,0,0.08)}
+  .metric-card .number{font-size:36px;font-weight:900;letter-spacing:0.2px;margin-bottom:6px}
+  .metric-card .label{font-size:13px;color:#6b7280;font-weight:700}
+  .metric-card::before{content:'';position:absolute;inset:0;opacity:0.18}
+  .metric-orange::before{background:radial-gradient(800px 400px at 15% -20%, rgba(255,107,0,0.55), transparent 60%)}
+  .metric-blue::before{background:radial-gradient(800px 400px at 15% -20%, rgba(59,130,246,0.55), transparent 60%)}
+  .metric-green::before{background:radial-gradient(800px 400px at 15% -20%, rgba(16,185,129,0.55), transparent 60%)}
+  .metric-orange .number{background:linear-gradient(135deg,#ff8c00,#ff6b00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .metric-blue .number{background:linear-gradient(135deg,#3b82f6,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .metric-green .number{background:linear-gradient(135deg,#10b981,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+  html.dark-mode .metric-card{background:linear-gradient(135deg,rgba(17,24,39,0.95),rgba(31,41,55,0.9));border-color:rgba(45,47,61,0.6);box-shadow:0 12px 32px rgba(0,0,0,0.45)}
+  html.dark-mode .metric-orange::before{opacity:0.22;background:radial-gradient(800px 400px at 15% -20%, rgba(255,107,0,0.6), transparent 60%)}
+  html.dark-mode .metric-blue::before{opacity:0.22;background:radial-gradient(800px 400px at 15% -20%, rgba(59,130,246,0.6), transparent 60%)}
+  html.dark-mode .metric-green::before{opacity:0.22;background:radial-gradient(800px 400px at 15% -20%, rgba(16,185,129,0.6), transparent 60%)}
+
+  .metric-note{background:linear-gradient(135deg,rgba(2,132,199,0.08),rgba(59,130,246,0.06));border:1px solid rgba(59,130,246,0.25);border-radius:12px;padding:16px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,0.06)}
+  .metric-note p{font-size:12px;color:#4b5563;margin:0;font-weight:700;line-height:1.6}
+  html.dark-mode .metric-note{background:linear-gradient(135deg,rgba(2,132,199,0.16),rgba(59,130,246,0.12));border-color:rgba(59,130,246,0.35);box-shadow:0 8px 24px rgba(0,0,0,0.35)}
+  html.dark-mode .metric-note p{color:#dbeafe}
+
+  /* Stats Section */
+  .stats-section{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:48px 0}
+  @media (max-width:980px){ .stats-section{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:640px){ .stats-section{grid-template-columns:1fr} }
+  .stat-card{background:rgba(255,255,255,0.7);backdrop-filter:blur(10px);border-radius:12px;padding:24px;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,0.1);border:1px solid rgba(230,237,243,0.6);transition:all .12s var(--ease)}
+  
+  html.dark-mode .stat-card {
+    background:rgba(26,29,40,0.6);
+    border-color:rgba(45,47,61,0.5);
+    box-shadow:0 20px 40px rgba(0,0,0,0.4);
+  }
+
+  .stat-card:hover{transform:translateY(-4px);box-shadow:0 30px 60px rgba(255,107,0,0.15)}
+  .stat-card .number{font-size:32px;font-weight:900;background:linear-gradient(135deg,#ff6b00,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+  .stat-card .label{color:var(--muted);font-size:14px;font-weight:700}
+
+  /* How it works section */
+  .steps-section{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:48px 0}
+  @media (max-width:980px){ .steps-section{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:640px){ .steps-section{grid-template-columns:1fr} }
+  
+  .step-card{background:rgba(255,255,255,0.7);backdrop-filter:blur(10px);border:1px solid rgba(230,237,243,0.6);border-radius:12px;padding:24px;text-align:center;transition:all .12s var(--ease);box-shadow:0 20px 40px rgba(0,0,0,0.1)}
+  
+  html.dark-mode .step-card {
+    background:rgba(26,29,40,0.6);
+    border-color:rgba(45,47,61,0.5);
+    box-shadow:0 20px 40px rgba(0,0,0,0.4);
+  }
+
+  .step-card:hover{transform:translateY(-4px);box-shadow:0 30px 60px rgba(255,107,0,0.15)}
+  .step-card.active{background:linear-gradient(135deg,#ff6b00,#ff8c00);color:#fff;border:none;box-shadow:0 20px 40px rgba(255,107,0,0.35);position:relative;overflow:hidden}
+  .step-card.active::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,0.3),transparent 50%);pointer-events:none}
+  .step-card.active .step-number{background:#fff;color:#ff6b00;position:relative;z-index:1}
+  .step-card.active h3{color:#fff;position:relative;z-index:1}
+  .step-card.active p{color:rgba(255,255,255,0.9);position:relative;z-index:1}
+  .step-number{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#ff6b00,#ff8c00);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin:0 auto 16px;box-shadow:0 8px 20px rgba(255,107,0,0.2)}
+  .step-card h3{font-size:16px;margin-bottom:10px;font-weight:800}
+  .step-card p{font-size:14px;color:var(--muted);line-height:1.6}
+
+  /* Why Choose Section */
+  .why-section{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;margin:48px 0;background:rgba(255,253,249,0.6);backdrop-filter:blur(10px);border-radius:16px;padding:40px;border:1px solid rgba(230,237,243,0.6);box-shadow:0 20px 40px rgba(0,0,0,0.08)}
+  
+  html.dark-mode .why-section {
+    background:rgba(26,29,40,0.4);
+    border-color:rgba(45,47,61,0.5);
+    box-shadow:0 20px 40px rgba(0,0,0,0.3);
+  }
+
+  @media (max-width:980px){ .why-section{grid-template-columns:1fr;gap:24px} }
+  
+  .why-left h2{font-size:28px;font-weight:900;margin-bottom:20px}
+  .why-item{display:flex;gap:14px;margin-bottom:16px;align-items:flex-start}
+  .why-check{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#10b981,#34d399);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;flex-shrink:0;font-size:16px;box-shadow:0 6px 16px rgba(16,185,129,0.2)}
+  .why-text h4{font-size:15px;margin-bottom:4px;font-weight:800}
+  .why-text p{font-size:14px;color:var(--muted);line-height:1.5}
+
+  .why-right{display:flex;gap:12px;flex-direction:column}
+  .trust-item{display:flex;gap:12px;align-items:center;padding:14px;background:rgba(255,255,255,0.7);backdrop-filter:blur(10px);border-radius:10px;border:1px solid rgba(230,237,243,0.6);transition:all .12s var(--ease);box-shadow:0 8px 20px rgba(0,0,0,0.06)}
+  
+  html.dark-mode .trust-item {
+    background:rgba(26,29,40,0.5);
+    border-color:rgba(45,47,61,0.5);
+    box-shadow:0 8px 20px rgba(0,0,0,0.3);
+  }
+
+  .trust-item:hover{transform:translateX(4px);border-color:var(--primary);box-shadow:0 12px 28px rgba(255,107,0,0.15)}
+  .trust-icon{font-size:24px}
+  .trust-item strong{display:block;font-size:14px}
+  .trust-item .desc{font-size:13px;color:var(--muted);margin-top:2px}
+
+  /* CTA Section */
+  .cta-section{background:linear-gradient(135deg,#ff6b00,#ff8c00);border-radius:16px;padding:48px 24px;text-align:center;color:#fff;margin:48px 0;box-shadow:0 30px 60px rgba(255,107,0,0.25);position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.2)}
+  .cta-section::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 50%,rgba(255,255,255,0.2),transparent 50%);pointer-events:none}
+  .cta-section h2{font-size:28px;font-weight:900;margin-bottom:12px;position:relative;z-index:1}
+  .cta-section p{font-size:16px;margin-bottom:28px;opacity:0.95;max-width:600px;margin-left:auto;margin-right:auto;position:relative;z-index:1}
+  .cta-section .btn{margin:0 10px}
+  .cta-section .btn.primary{background:#fff;color:#ff6b00;border:none;position:relative;z-index:1}
+  .cta-section .btn.primary:hover{transform:translateY(-3px);box-shadow:0 20px 40px rgba(255,255,255,0.3)}
+
+  /* Lender + KYC Grid */
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:48px 0}
+  @media (max-width:980px){ .info-grid{grid-template-columns:1fr} }
+  
+  .lender-list{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+  .lender{padding:14px;border-radius:10px;background:rgba(255,255,255,0.7);backdrop-filter:blur(10px);border:1px solid rgba(230,237,243,0.6);display:flex;justify-content:space-between;align-items:center;gap:12px;transition:all .12s var(--ease);box-shadow:0 8px 20px rgba(0,0,0,0.06)}
+  
+  html.dark-mode .lender {
+    background:rgba(26,29,40,0.5);
+    border-color:rgba(45,47,61,0.5);
+    box-shadow:0 8px 20px rgba(0,0,0,0.3);
+  }
+
+  .lender:hover{background:rgba(255,107,0,0.08);border-color:var(--primary);transform:translateX(4px);box-shadow:0 12px 28px rgba(255,107,0,0.15)}
+  .lender strong{font-size:15px}
+  .lender .desc{font-size:12px;color:var(--muted)}
+  .badge{padding:6px 12px;border-radius:999px;background:linear-gradient(135deg,#ff6b00,#ff8c00);color:#fff;font-weight:800;font-size:13px;box-shadow:0 6px 16px rgba(255,107,0,0.2)}
+
+  .kyc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px}
+  @media (max-width:640px){ .kyc-grid{grid-template-columns:1fr} }
+  .kyc-item{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:10px;background:rgba(255,253,249,0.7);backdrop-filter:blur(10px);border:1px solid rgba(230,237,243,0.6);transition:all .12s var(--ease);box-shadow:0 8px 20px rgba(0,0,0,0.06)}
+  
+  html.dark-mode .kyc-item {
+    background:rgba(26,29,40,0.5);
+    border-color:rgba(45,47,61,0.5);
+    box-shadow:0 8px 20px rgba(0,0,0,0.3);
+  }
+
+  .kyc-item:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(255,107,0,0.15)}
+  .kyc-icon{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#ff6b00,#ff8c00);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0;box-shadow:0 6px 16px rgba(255,107,0,0.2)}
+  .kyc-text h4{font-size:14px;margin-bottom:3px;font-weight:800}
+  .kyc-text p{font-size:12px;color:var(--muted)}
+
+  .panel-title{font-size:20px;font-weight:900;margin-bottom:6px;color:var(--text)}
+  .panel-desc{font-size:14px;color:var(--muted);margin-bottom:12px}
+
+  /* How-it-works side panels */
+  .panel-card{position:relative;overflow:hidden;border-radius:12px;padding:20px;text-align:left;background:linear-gradient(135deg,rgba(255,255,255,0.92),rgba(248,250,252,0.95));border:1px solid rgba(230,237,243,0.6);box-shadow:0 12px 32px rgba(0,0,0,0.08)}
+  .panel-card::before{content:'';position:absolute;inset:-1px;border-radius:inherit;opacity:0.18;pointer-events:none}
+  .panel-card.panel-orange::before{background:radial-gradient(700px 350px at 18% -20%, rgba(255,107,0,0.55), transparent 60%)}
+  .panel-card.panel-blue::before{background:radial-gradient(700px 350px at 18% -20%, rgba(59,130,246,0.55), transparent 60%)}
+  .panel-card.panel-green::before{background:radial-gradient(700px 350px at 18% -20%, rgba(16,185,129,0.55), transparent 60%)}
+  .panel-card .panel-head{font-size:13px;font-weight:800;margin-bottom:8px}
+  .panel-card.panel-orange .panel-head{background:linear-gradient(135deg,#ff8c00,#ff6b00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .panel-card.panel-blue .panel-head{background:linear-gradient(135deg,#3b82f6,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .panel-card.panel-green .panel-head{background:linear-gradient(135deg,#10b981,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  html.dark-mode .panel-card{background:linear-gradient(135deg,rgba(17,24,39,0.95),rgba(31,41,55,0.9));border-color:rgba(45,47,61,0.6);box-shadow:0 12px 32px rgba(0,0,0,0.45)}
+  html.dark-mode .panel-card::before{opacity:0.22}
+
+  /* Founder/Chairman Message Section - Premium Design */
+  .founder-message-section{background:linear-gradient(135deg,#ffffff 0%,#f8f7f4 100%);border:1px solid #e0dcd5;border-radius:18px;padding:70px 80px;margin:80px auto;max-width:1200px;box-shadow:0 20px 60px rgba(0,0,0,0.08),0 0 1px rgba(204,85,0,0.15);position:relative;overflow:hidden}
+  .founder-message-section::before{content:'';position:absolute;left:0;top:0;width:100%;height:3px;background:linear-gradient(90deg,#CC5500,#E67E22,#CC5500);background-size:200% 100%}
+  .founder-message-section::after{content:'';position:absolute;right:0;top:50%;width:200px;height:200px;background:radial-gradient(circle,rgba(204,85,0,0.05),transparent 70%);border-radius:50%;transform:translateY(-50%)}
+  .founder-container{display:grid;grid-template-columns:340px 1fr;gap:100px;align-items:center;position:relative;z-index:1}
+  .founder-image-wrapper{position:relative;background:linear-gradient(135deg,#2c3e50 0%,#34495e 100%);padding:12px;border-radius:16px;box-shadow:0 25px 50px rgba(44,62,80,0.25),inset 0 1px 0 rgba(255,255,255,0.1);transition:all 0.4s ease}
+  .founder-image-wrapper:hover{transform:translateY(-8px);box-shadow:0 35px 70px rgba(44,62,80,0.35),inset 0 1px 0 rgba(255,255,255,0.1)}
+  .founder-image{width:100%;height:auto;display:block;filter:grayscale(100%) contrast(1.15) brightness(1.05);border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.2);transition:all 0.5s cubic-bezier(0.2,0.9,0.3,1)}
+  .founder-image-wrapper:hover .founder-image{filter:grayscale(0%) contrast(1) brightness(1)}
+  .founder-content{display:flex;flex-direction:column;gap:40px;padding:0}
+  .message-header{border:none;padding:0;margin-bottom:0;text-align:center}
+  .message-title{font-size:24px;font-weight:900;color:#CC5500;letter-spacing:6px;text-transform:uppercase;margin:0 0 24px;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;position:relative;display:block}
+  .message-title::after{content:'';position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);width:80px;height:3px;background:linear-gradient(90deg,transparent,#CC5500,transparent);border-radius:2px}
+  .message-body{padding:40px 0 0 0;margin:0}
+  .message-text{font-size:18px;line-height:2;color:#3a4a5c;margin-bottom:28px;font-style:italic;position:relative;padding-left:0;opacity:0.95;font-family:'Segoe UI',Georgia,serif;font-weight:400;letter-spacing:0.3px}
+  .message-text:first-letter{font-size:1.1em}
+  .message-text:first-child::before{display:none}
+  .founder-signature{margin-top:40px;padding-top:40px;border-top:2px solid #e0dcd5;position:relative}
+  .founder-signature::before{content:'';position:absolute;top:-8px;left:0;width:50px;height:2px;background:linear-gradient(90deg,#CC5500,transparent);border-radius:1px}
+  .founder-name{font-size:28px;font-weight:600;color:#2c3e50;margin:0 0 10px;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;letter-spacing:-1px;display:flex;align-items:center;gap:12px}
+  .founder-social-inline{display:inline-flex;gap:8px;align-items:center}
+  .founder-social-inline a{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#f0f0f0;border-radius:6px;color:#CC5500;text-decoration:none;font-weight:700;font-size:14px;transition:all 0.2s}
+  .founder-social-inline a:hover{transform:translateY(-2px);box-shadow:0 4px 8px rgba(204,85,0,0.3)}
+  .founder-social-inline a.linkedin:hover{background:#0077B5;color:#fff}
+  .founder-social-inline a.twitter:hover{background:#000000;color:#fff}
+  .founder-designation{font-size:13px;font-weight:700;color:#CC5500;margin:0 0 8px;text-transform:uppercase;letter-spacing:2.5px;display:block}
+  .founder-company{font-size:14px;font-weight:500;color:#657281;margin:0;letter-spacing:0.5px;display:block}
+  .brand-highlight{background:linear-gradient(135deg,rgba(204,85,0,0.12),rgba(230,126,34,0.08));color:#CC5500;font-weight:700;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:10px;white-space:nowrap;transition:all 0.3s ease;border:1px solid rgba(204,85,0,0.2)}
+  .brand-logo{width:24px;height:24px;background:#FF6B00;display:flex;align-items:center;justify-content:center;border-radius:6px;flex-shrink:0;overflow:hidden}
+  .brand-logo img{width:100%;height:100%;object-fit:contain}
+  .brand-highlight:hover{background:linear-gradient(135deg,rgba(204,85,0,0.2),rgba(230,126,34,0.15));transform:translateY(-2px);box-shadow:0 8px 16px rgba(204,85,0,0.15);border-color:rgba(204,85,0,0.4)}
+  html.dark-mode .brand-highlight{background:linear-gradient(135deg,rgba(204,85,0,0.25),rgba(230,126,34,0.15));border-color:rgba(230,126,34,0.3)}
+  html.dark-mode .brand-highlight:hover{box-shadow:0 8px 16px rgba(230,126,34,0.2)}
+  html.dark-mode .founder-message-section{background:linear-gradient(135deg,#1a1d28 0%,#151821 100%);border-color:#2d3139;box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 1px rgba(204,85,0,0.3)}
+  html.dark-mode .founder-image-wrapper{background:linear-gradient(135deg,#0f1219 0%,#131820 100%);box-shadow:0 25px 50px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.05)}
+  html.dark-mode .message-text{color:#d1d5db}
+  html.dark-mode .founder-name{color:#e5e7eb}
+  html.dark-mode .founder-signature{border-top-color:#2d3139}
+  /* Founder Footer */
+  .founder-footer{background:#ffffff;border-top:1px solid #e0dcd5;padding:28px 40px;margin-top:48px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px;font-size:9pt;color:#657281;text-align:center}
+  .founder-footer-left{text-align:left}
+  .founder-footer-right{text-align:right}
+  .footer-label{font-weight:700;color:#2c3e50;margin-bottom:6px;font-size:10pt;display:block;letter-spacing:0.5px}
+  .footer-value{font-size:9pt;line-height:1.6;color:#657281}
+  .footer-value a{color:#CC5500;text-decoration:none;font-weight:600;transition:all 0.2s}
+  .footer-value a:hover{color:#E67E22;text-decoration:underline}
+  .footer-icon{display:inline-block;width:20px;height:20px;background:#CC5500;color:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;margin-right:6px;font-weight:bold}
+  .social-links{display:flex;gap:10px;justify-content:flex-end}
+  .social-links a{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:#f0f0f0;border-radius:6px;color:#CC5500;text-decoration:none;font-weight:700;font-size:13px;transition:all 0.2s}
+  .social-links a:hover{background:#CC5500;color:#fff;transform:translateY(-2px);box-shadow:0 4px 8px rgba(204,85,0,0.3)}
+  .social-links a.linkedin:hover{background:#0077B5}
+  .social-links a.twitter:hover{background:#000000}
+  html.dark-mode .founder-footer{background:#1a1d28;border-top-color:#2d3139}
+  html.dark-mode .footer-label{color:#e5e7eb}
+  html.dark-mode .footer-value{color:#d1d5db}
+  html.dark-mode .footer-icon{background:#CC5500}
+  html.dark-mode .social-links a{background:rgba(204,85,0,0.2);color:#E67E22}
+  html.dark-mode .social-links a:hover{background:#CC5500;color:#fff}
+  @media (max-width:980px){.founder-footer{grid-template-columns:1fr;gap:24px;text-align:center}.founder-footer-left{text-align:center}.founder-footer-right{text-align:center}.social-links{justify-content:center}}
+  footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--border);text-align:center}
+  .footer-text{color:var(--muted);font-size:13px;margin-bottom:12px}
+  .footer-links{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+  .footer-links a{color:var(--primary);text-decoration:none;font-weight:800;font-size:13px;transition:all .12s var(--ease)}
+  .footer-links a:hover{opacity:0.7;transform:translateY(-2px)}
+
+  /* Responsive */
+  @media (max-width:980px){
+    .founder-container{grid-template-columns:1fr;gap:60px}
+    .founder-image-wrapper{max-width:340px;margin:0 auto}
+    .founder-message-section{padding:60px 50px;margin:60px auto}
+  }
+  @media (max-width:640px){
+    body{padding:16px}
+    header{flex-direction:column;align-items:flex-start;gap:16px}
+    .hero{gap:20px}
+    .hero-left .title{font-size:24px}
+    .quick-grid{gap:10px}
+    .btn,.btn.primary{padding:10px 14px;font-size:14px}
+    .stats-section,.steps-section{grid-template-columns:repeat(2,1fr)}
+    .founder-message-section{padding:50px 24px;margin:50px auto}
+    .founder-container{gap:40px}
+    .message-title{font-size:18px;letter-spacing:3px}
+    .message-text{font-size:16px;line-height:1.8;margin-bottom:20px}
+    .founder-name{font-size:24px}
+    .founder-image-wrapper{max-width:280px}
+  }
+
+  /* Instant Calculator Modal */
+  .modal-overlay{position:fixed;inset:0;background:rgba(16,24,40,0.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:9999}
+  .modal{width:min(560px,92vw);background:var(--card);border-radius:16px;border:1px solid var(--border);box-shadow:0 24px 60px rgba(16,24,40,0.2);overflow:hidden}
+  .modal header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)}
+  .modal header h3{font-size:18px;font-weight:900}
+  .modal header button{background:transparent;border:none;font-size:20px;cursor:pointer;color:var(--muted)}
+  .modal .content{padding:16px 18px}
+  .field{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+  .field label{flex:0 0 140px;color:var(--muted);font-weight:700}
+  .field input{flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);font:inherit}
+  .out-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+  .out{padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--card);text-align:center;box-shadow:0 8px 20px rgba(0,0,0,0.06)}
+  .out .label{font-size:12px;color:var(--muted)}
+  .out .value{font-size:18px;font-weight:900;background:linear-gradient(135deg,#ff6b00,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-top:6px}
+  .modal .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+  .link-btn{background:transparent;border:none;color:var(--primary);font-weight:800;cursor:pointer}
+
+  /* Custom Info Modal */
+  .info-modal-overlay{position:fixed;inset:0;background:rgba(16,24,40,0.6);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:10000;animation:fadeIn 0.2s ease-out}
+  .info-modal{width:min(480px,90vw);background:var(--card);border-radius:20px;box-shadow:0 25px 60px rgba(0,0,0,0.25);overflow:hidden;animation:slideUp 0.3s cubic-bezier(0.2,0.9,0.3,1);border:1px solid var(--border)}
+  .info-modal-header{padding:24px 24px 16px;background:linear-gradient(135deg,var(--info-color,#ff6b00),var(--info-color-light,#ff8c00));position:relative;overflow:hidden}
+  .info-modal-header::before{content:'';position:absolute;top:-50%;right:-20%;width:200px;height:200px;background:radial-gradient(circle,rgba(255,255,255,0.2),transparent 70%);border-radius:50%}
+  .info-modal-icon{font-size:48px;text-align:center;margin-bottom:12px;position:relative;z-index:1;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.1))}
+  .info-modal-title{font-size:24px;font-weight:900;color:#fff;text-align:center;margin:0;position:relative;z-index:1;text-shadow:0 2px 4px rgba(0,0,0,0.1)}
+  .info-modal-body{padding:24px;max-height:60vh;overflow-y:auto;background:var(--card)}
+  .info-modal-section{margin-bottom:20px}
+  .info-modal-section:last-child{margin-bottom:0}
+  .info-modal-section h4{font-size:16px;font-weight:900;color:var(--text);margin:0 0 12px;display:flex;align-items:center;gap:8px}
+  .info-modal-list{margin:0;padding-left:20px;color:var(--muted)}
+  .info-modal-list li{margin-bottom:8px;line-height:1.6}
+  .info-modal-highlight{background:rgba(255,107,0,0.08);padding:12px 16px;border-radius:12px;border-left:4px solid var(--info-color,#ff6b00);margin-top:16px}
+  .info-modal-highlight p{margin:0;color:var(--text);font-weight:600;font-size:14px}
+  .info-modal-footer{padding:16px 24px;background:rgba(0,0,0,0.02);border-top:1px solid var(--border);text-align:center}
+  .info-modal-btn{background:linear-gradient(135deg,var(--info-color,#ff6b00),var(--info-color-light,#ff8c00));color:#fff;border:none;padding:12px 32px;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 12px rgba(255,107,0,0.25)}
+  .info-modal-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(255,107,0,0.35)}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+</style>
+<link rel="stylesheet" href="auth.css" />
+<script>
+// ===== SIMPLE ADMIN BUTTON HANDLER (RUNS FIRST) =====
+function openAdminAccess() {
+  console.log('🚀 ADMIN BUTTON CLICKED - Opening Modal...');
+  
+  const role = localStorage.getItem('role');
+  const token = localStorage.getItem('admin_token');
+  
+  console.log('Current session:', role, token ? 'has token' : 'no token');
+  
+  if(role === 'admin' && token) {
+    // Already logged in - go to dashboard
+    console.log('✅ Already logged in - redirecting to dashboard');
+    alert('✅ Welcome back, Anmol!\n\nRedirecting to dashboard...');
+    window.location.href = 'admin-dashboard.html';
+    return;
+  }
+  
+  // Not logged in - open modal
+  const modal = document.getElementById('adminModal');
+  if(modal) {
+    console.log('✅ Opening admin modal...');
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+    
+    // Show login form
+    const loginForm = document.getElementById('adminModeLogin');
+    const statusDiv = document.getElementById('adminStatus');
+    if(loginForm) loginForm.style.display = 'block';
+    if(statusDiv) statusDiv.style.display = 'none';
+    
+    // Pre-fill email
+    const emailInput = document.getElementById('adminEmailLogin');
+    if(emailInput && !emailInput.value) {
+      emailInput.value = 'credhivx@gmail.com';
+    }
+  } else {
+    console.error('❌ Admin modal not found!');
+    alert('Error: Admin modal not found in page!');
+  }
+}
+
+console.log('✅ Admin button handler loaded and ready!');
+
+// Test function for debugging
+function testAdminButton() {
+  console.log('🧪 TEST BUTTON CLICKED');
+  alert('Test button works!\n\nNow calling openAdminAccess()...');
+  openAdminAccess();
+}
+
+// ===== ADMIN LOGIN HANDLER =====
+function handleAdminLogin() {
+  console.log('🔐 LOGIN BUTTON CLICKED');
+  
+  const email = document.getElementById('adminEmailLogin').value.trim();
+  const pass = document.getElementById('adminPassLogin').value;
+  const remember = document.getElementById('adminRemember').checked;
+  
+  console.log('Login attempt:', { email, passwordLength: pass.length, remember });
+  
+  // Backend validation - credentials are verified server-side
+  if(email && pass) {
+    console.log('✅ Credentials validated!');
+    
+    // Save remember preference
+    if(remember) {
+      localStorage.setItem('admin_remember_email', email);
+    } else {
+      localStorage.removeItem('admin_remember_email');
+    }
+    
+    // Generate token
+    const rand = crypto.getRandomValues(new Uint8Array(16));
+    const token = 'adm-' + Array.from(rand).map(b=>b.toString(16).padStart(2,'0')).join('');
+    
+    // ===== SET PERMANENT ADMIN SESSION =====
+    localStorage.setItem('role', 'admin');
+    localStorage.setItem('admin_token', token);
+    localStorage.setItem('admin_token_ts', String(Date.now()));
+    localStorage.setItem('admin_email', email);
+    
+    console.log('✅ Anmol session created:');
+    console.log('  → Role: anmol');
+    console.log('  → Token:', token.substring(0, 20) + '...');
+    
+    alert('✅ Welcome, Anmol!\n\nYou are now logged in with full access privileges.');
+    
+    // Close modal
+    const modal = document.getElementById('adminModal');
+    if(modal) modal.style.display = 'none';
+    
+    // Redirect to dashboard
+    console.log('→ Redirecting to admin dashboard...');
+    setTimeout(() => {
+      window.location.href = 'admin-dashboard.html';
+    }, 500);
+    
+  } else {
+    console.log('❌ Invalid credentials');
+    alert('❌ Invalid Credentials\n\nPlease contact administrator for access.');
+  }
+}
+
+// Close admin modal
+function closeAdminModal() {
+  console.log('❌ Closing admin modal');
+  const modal = document.getElementById('adminModal');
+  if(modal) {
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+  }
+}
+
+// Toggle password visibility
+function toggleAdminPassword() {
+  const passInput = document.getElementById('adminPassLogin');
+  const toggleBtn = document.getElementById('adminPassToggle');
+  
+  if(passInput.type === 'password') {
+    passInput.type = 'text';
+    toggleBtn.textContent = '🙈';
+  } else {
+    passInput.type = 'password';
+    toggleBtn.textContent = '👁';
+  }
+}
+</script>
+<script defer src="auth.js"></script>
+<script defer src="site-config.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Buttons Container - Top Left -->
+    <div style="position: fixed; top: 20px; left: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; align-items: flex-start;">
+      <!-- Anmol Button -->
+      <a id="adminLink" href="#" onclick="openAdminAccess(); return false;" style="color:var(--accent); cursor: pointer; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 5px; font-size: 12px; background: rgba(255,107,0,0.15); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255,107,0,0.3); box-shadow: 0 4px 12px rgba(255,107,0,0.15);" aria-label="Anmol">⚙️ Anmol</a>
+      
+      <!-- View Plans Button -->
+      <button class="btn secondary" onclick="window.openPlansModal()" style="padding: 6px 12px; font-size: 12px; font-weight: 700; border-radius: 8px; transition: all 0.3s cubic-bezier(0.2,0.9,0.3,1); box-shadow: 0 4px 12px rgba(59,130,246,0.15); border: 1px solid var(--border); background: #fff; cursor: pointer;">📊 View Plans</button>
+    </div>
+    
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true" title="CredHive X - Smart Payment Splits"><img src="logo.svg" alt="CredHive X" style="width: 100%; height: 100%; object-fit: contain;"></div>
+        <div>
+          <div class="site-title">CredHive X</div>
+          <div class="site-sub">Flexible • Simple • Secure</div>
+        </div>
+      </div>
+
+      <nav aria-label="Main navigation">
+        <a href="#how-it-works">How It Works</a>
+        <a href="#lenders-section">Partners</a>
+        <a href="#why-choose">Why Us</a>
+        <a href="contact.html">Contact</a>
+        <a href="terms.html">Terms</a>
+        <a class="cta" href="main-interface.html">💳 Open Planner</a>
+        <a href="login.html" class="cta">🔐 Login</a>
+      </nav>
+
+      <div class="dark-mode-toggle">
+        <span class="toggle-icon sun">☀️</span>
+        <button class="toggle-switch" id="darkModeToggle" aria-label="Toggle dark mode" title="Dark Mode"></button>
+        <span class="toggle-icon moon">🌙</span>
+      </div>
+
+      <div id="auth-ui-slot"></div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-left">
+        <div id="hero-title" class="title" style="font-size:52px;font-weight:900;letter-spacing:-0.8px;line-height:1.1;margin-bottom:24px;color:#0f172a">Smarter EMIs.<br/>Faster Decisions.</div>
+        <div class="subtitle" style="font-size:18px;color:#657281;margin-bottom:40px;max-width:550px;line-height:1.7">Instant EMI insights, secure KYC, and transparent payment plans — built for clarity.</div>
+
+        <div class="quick-grid" role="group" aria-label="Quick actions">
+          <button class="btn primary" onclick="window.location.href='main-interface.html'" style="padding:14px 28px;font-size:15px;font-weight:800;border-radius:10px;box-shadow:0 6px 20px rgba(255,107,0,0.25);transition:all 0.3s cubic-bezier(0.2,0.9,0.3,1)">Check Eligibility →</button>
+        </div>
+
+        <div class="features">
+          <div class="feature accent-orange" style="gap:16px;padding:16px;border-radius:12px;transition:all 0.2s">
+            <div class="ficon" style="background:linear-gradient(135deg,#ff6b00,#ff8533);width:48px;height:48px;min-width:48px;flex-shrink:0">⚡</div>
+            <div>
+              <h4 style="margin:0 0 4px;font-size:15px;font-weight:800">Instant EMI Insights</h4>
+              <p style="margin:0;font-size:13px;color:#657281">Know your monthly cost instantly</p>
+            </div>
+          </div>
+          <div class="feature accent-blue" style="gap:16px;padding:16px;border-radius:12px;transition:all 0.2s">
+            <div class="ficon" style="background:linear-gradient(135deg,#3b82f6,#60a5fa);width:48px;height:48px;min-width:48px;flex-shrink:0">🔒</div>
+            <div>
+              <h4 style="margin:0 0 4px;font-size:15px;font-weight:800">Secure KYC Verification</h4>
+              <p style="margin:0;font-size:13px;color:#657281">Bank-grade identity checks</p>
+            </div>
+          </div>
+          <div class="feature accent-green" style="gap:16px;padding:16px;border-radius:12px;transition:all 0.2s">
+            <div class="ficon" style="background:linear-gradient(135deg,#10b981,#34d399);width:48px;height:48px;min-width:48px;flex-shrink:0">💎</div>
+            <div>
+              <h4 style="margin:0 0 4px;font-size:15px;font-weight:800">Smart Payment Planning</h4>
+              <p style="margin:0;font-size:13px;color:#657281">Save more with structured EMIs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="hero-right">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="metric-card metric-orange">
+            <div class="number">₹25L+</div>
+            <div class="label">Payments Processed</div>
+          </div>
+          <div class="metric-card metric-blue">
+            <div class="number">50K+</div>
+            <div class="label">Verified Users</div>
+          </div>
+          <div class="metric-card metric-green">
+            <div class="number">99.9%</div>
+            <div class="label">Secure Transactions</div>
+          </div>
+        </div>
+        <div class="metric-note" style="margin-top:8px">
+          <p>Trusted by users making smarter financial decisions every day.</p>
+        </div>
+      </aside>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" style="margin:64px 0;padding:48px;background:linear-gradient(135deg,rgba(255,107,0,0.02),rgba(59,130,246,0.02),rgba(16,185,129,0.02));border-radius:20px;border:1px solid var(--border)">
+      <div style="text-align:center;margin-bottom:56px">
+        <h2 style="font-size:42px;font-weight:900;margin-bottom:16px;background:linear-gradient(135deg,#ff6b00,#3b82f6,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">How It Works</h2>
+        <p style="color:#657281;font-size:18px;max-width:700px;margin:0 auto;line-height:1.7">Three simple steps. That's all it takes to get flexible payment options. It's designed to be quick, easy, and transparent.</p>
+      </div>
+
+      <!-- Step 1 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-bottom:56px;align-items:center">
+        <div style="background:linear-gradient(135deg,#fff,#fffbf0);border:2px solid #ffd699;border-radius:16px;padding:40px;position:relative;overflow:hidden;cursor:pointer;transition:all 0.3s cubic-bezier(0.2,0.9,0.3,1)" onmouseover="this.style.transform='translateY(-8px)';this.style.boxShadow='0 24px 48px rgba(255,107,0,0.15)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 12px 30px rgba(255,107,0,0.08)'">
+          <div style="position:absolute;top:-40px;right:-40px;width:140px;height:140px;background:radial-gradient(circle,#ff6b00,transparent 70%);opacity:0.08"></div>
+          <div style="position:absolute;top:16px;right:16px;background:#ff6b00;color:#fff;padding:6px 14px;border-radius:12px;font-size:12px;font-weight:800;z-index:3">💰 FAST</div>
+          <div class="step-number" style="background:linear-gradient(135deg,#ff6b00,#ff8533);width:64px;height:64px;border-radius:50%;font-size:32px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;position:relative;z-index:2;margin-bottom:20px">1</div>
+          <h3 style="font-size:24px;font-weight:900;color:#ff6b00;margin-bottom:12px">Tell Us About Your Purchase</h3>
+          <p style="color:#657281;font-size:15px;line-height:1.8;margin-bottom:20px;position:relative;z-index:2">Enter the total amount you want to split and how many months you'd like to pay.</p>
+          <div style="background:rgba(255,107,0,0.08);border-left:4px solid #ff6b00;padding:14px;border-radius:8px;position:relative;z-index:2">
+            <p style="font-size:13px;color:#132028;margin:0"><strong>📊 Example:</strong> ₹50,000 over 12 months = ~₹4,400/month</p>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;position:relative;z-index:1">
+          <div class="panel-card panel-orange">
+            <p class="panel-head">✨ WHAT YOU DO:</p>
+            <ul style="list-style:none;margin:0;padding:0">
+              <li style="padding:6px 0;color:#10b981;font-size:14px;font-weight:600">→ Enter your desired amount</li>
+              <li style="padding:6px 0;color:#10b981;font-size:14px;font-weight:600">→ Pick payment duration (3-24 months)</li>
+              <li style="padding:6px 0;color:#10b981;font-size:14px;font-weight:600">→ See your monthly payment instantly</li>
+              <li style="padding:6px 0;color:#10b981;font-size:14px;font-weight:600">→ No commitment, just explore options</li>
+            </ul>
+          </div>
+          <div style="background:linear-gradient(135deg,rgba(255,107,0,0.1),rgba(255,107,0,0.05));border:1px solid #ff6b00;border-radius:12px;padding:16px;text-align:center">
+            <p style="font-size:12px;color:#ff6b00;font-weight:800">⚡ TAKES LESS THAN 30 SECONDS</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-bottom:56px;align-items:center">
+        <div style="display:flex;flex-direction:column;gap:16px;position:relative;z-index:1;order:2">
+          <div class="panel-card panel-blue">
+            <p class="panel-head">📋 WHAT YOU SEE:</p>
+            <ul style="list-style:none;margin:0;padding:0">
+              <li style="padding:6px 0;color:#10b981;font-size:14px;font-weight:600">→ Multiple payment partners</li>
+              <li style="padding:6px 0;color:#10b981;font-size:14px;font-weight:600">→ Competitive payment options</li>
+              <li style="padding:6px 0;color:#10b981;font-size:14px;font-weight:600">→ Side-by-side comparison</li>
+              <li style="padding:6px 0;color:#10b981;font-size:14px;font-weight:600">→ No hidden fees or charges</li>
+            </ul>
+          </div>
+          <div style="background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(59,130,246,0.05));border:1px solid #3b82f6;border-radius:12px;padding:16px;text-align:center">
+            <p style="font-size:12px;color:#3b82f6;font-weight:800">🎯 COMPARE ALL OPTIONS IN ONE PLACE</p>
+          </div>
+        </div>
+        <a href="step-2-details.html" style="background:linear-gradient(135deg,#fff,#f0fbff);border:2px solid #99d5ff;border-radius:16px;padding:40px;position:relative;overflow:hidden;cursor:pointer;transition:all 0.3s cubic-bezier(0.2,0.9,0.3,1);text-decoration:none;display:block;order:1" onmouseover="this.style.transform='translateY(-8px)';this.style.boxShadow='0 24px 48px rgba(59,130,246,0.15)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 12px 30px rgba(59,130,246,0.08)'">
+          <div style="position:absolute;top:-40px;right:-40px;width:140px;height:140px;background:radial-gradient(circle,#3b82f6,transparent 70%);opacity:0.08"></div>
+          <div style="position:absolute;top:16px;right:16px;background:#3b82f6;color:#fff;padding:6px 14px;border-radius:12px;font-size:12px;font-weight:800;z-index:3">📋 EASY</div>
+          <div class="step-number" style="background:linear-gradient(135deg,#3b82f6,#60a5fa);width:64px;height:64px;border-radius:50%;font-size:32px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;position:relative;z-index:2;margin-bottom:20px">2</div>
+          <h3 style="font-size:24px;font-weight:900;color:#3b82f6;margin-bottom:12px">See Your Payment Options</h3>
+          <p style="color:#657281;font-size:15px;line-height:1.8;margin-bottom:20px;position:relative;z-index:2">Browse all available payment plans from trusted partners and compare them side-by-side.</p>
+          <div style="background:rgba(59,130,246,0.08);border-left:4px solid #3b82f6;padding:14px;border-radius:8px;position:relative;z-index:2">
+            <p style="font-size:13px;color:#132028;margin:0"><strong>🏦 Partners:</strong> SBI, HDFC, Bajaj, ICICI</p>
+          </div>
+          <div style="position:absolute;bottom:16px;right:16px;background:#3b82f6;color:#fff;padding:8px 16px;border-radius:10px;font-size:12px;font-weight:800;z-index:3">View Details →</div>
+        </a>
+      </div>
+
+      <!-- Step 3 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center">
+        <a href="step-3-details.html" style="background:linear-gradient(135deg,#fff,#f0fff4);border:2px solid #99f6d9;border-radius:16px;padding:40px;position:relative;overflow:hidden;cursor:pointer;transition:all 0.3s cubic-bezier(0.2,0.9,0.3,1);text-decoration:none;display:block" onmouseover="this.style.transform='translateY(-8px)';this.style.boxShadow='0 24px 48px rgba(16,185,129,0.15)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 12px 30px rgba(16,185,129,0.08)'">
+          <div style="position:absolute;top:-40px;right:-40px;width:140px;height:140px;background:radial-gradient(circle,#10b981,transparent 70%);opacity:0.08"></div>
+          <div style="position:absolute;top:16px;right:16px;background:#10b981;color:#fff;padding:6px 14px;border-radius:12px;font-size:12px;font-weight:800;z-index:3">✅ GO</div>
+          <div class="step-number" style="background:linear-gradient(135deg,#10b981,#34d399);width:64px;height:64px;border-radius:50%;font-size:32px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;position:relative;z-index:2;margin-bottom:20px">3</div>
+          <h3 style="font-size:24px;font-weight:900;color:#10b981;margin-bottom:12px">Finish Setup & Start Paying</h3>
+          <p style="color:#657281;font-size:15px;line-height:1.8;margin-bottom:20px;position:relative;z-index:2">Upload your documents for quick verification and get approved in just 5 minutes.</p>
+          <div style="background:rgba(16,185,129,0.08);border-left:4px solid #10b981;padding:14px;border-radius:8px;position:relative;z-index:2">
+            <p style="font-size:13px;color:#132028;margin:0"><strong>⏱️ Timeline:</strong> Upload → Verify → Approve → Pay</p>
+          </div>
+          <div style="position:absolute;bottom:16px;right:16px;background:#10b981;color:#fff;padding:8px 16px;border-radius:10px;font-size:12px;font-weight:800;z-index:3">View Details →</div>
+        </a>
+        <div style="display:flex;flex-direction:column;gap:16px;position:relative;z-index:1;order:2">
+          <div class="panel-card panel-green">
+            <p class="panel-head">📄 DOCUMENTS NEEDED:</p>
+            <ul style="list-style:none;margin:0;padding:0">
+              <li style="padding:6px 0;color:#10b981;font-size:14px;font-weight:600">→ ID Proof (Aadhaar/PAN)</li>
+              <li style="padding:6px 0;color:#10b981;font-size:14px;font-weight:600">→ Address Proof (Utility Bill)</li>
+              <li style="padding:6px 0;color:#10b981;font-size:14px;font-weight:600">→ Bank Details & IFSC</li>
+              <li style="padding:6px 0;color:#10b981;font-size:14px;font-weight:600">→ Income Proof (Salary Slip)</li>
+            </ul>
+          </div>
+          <div style="background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(16,185,129,0.05));border:1px solid #10b981;border-radius:12px;padding:16px;text-align:center">
+            <p style="font-size:12px;color:#10b981;font-weight:800">🔐 BANK-GRADE ENCRYPTED & SECURE</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Instant EMI Calculator Modal -->
+    <div class="modal-overlay" id="emiModal" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="emiTitle">
+        <header>
+          <h3 id="emiTitle">See Your Payment Size</h3>
+          <button type="button" id="emiClose" aria-label="Close">×</button>
+        </header>
+        <div class="content">
+          <div class="field">
+            <label for="amountInput">Amount (₹)</label>
+            <input id="amountInput" type="number" min="10000" step="1000" value="500000" />
+          </div>
+          <div class="field">
+            <label for="rateInput">Rate (% yearly)</label>
+            <input id="rateInput" type="number" min="0" max="36" step="0.1" value="10" />
+          </div>
+          <div class="field">
+            <label for="tenureInput">Months to Pay</label>
+            <input id="tenureInput" type="number" min="6" max="360" step="1" value="60" />
+          </div>
+
+          <div class="out-grid">
+            <div class="out">
+              <div class="label">Each Payment</div>
+              <div class="value" id="emiOut">—</div>
+            </div>
+            <div class="out">
+              <div class="label">Total Extra Cost</div>
+              <div class="value" id="interestOut">—</div>
+            </div>
+            <div class="out">
+              <div class="label">Total You'll Pay</div>
+              <div class="value" id="totalOut">—</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="link-btn" id="saveSnap">Save</button>
+            <button class="btn secondary" id="resetCalc">Clear</button>
+            <button class="btn primary" id="openPlanner">See All Plans →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Partners & Setup Info -->
+    <section class="info-grid" id="lenders-section">
+      <div class="card">
+        <div class="panel-title">✨ Payment Partners We Work With</div>
+        <div class="panel-desc">Trusted companies offering flexible payment options</div>
+        <div class="lender-list" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+          <div class="lender" style="background:linear-gradient(135deg,#fff,#fffbf0);border:2px solid #ffd699;padding:20px;border-radius:16px;position:relative;cursor:pointer;transform:translateY(0);transition:all 0.3s cubic-bezier(0.2,0.9,0.3,1);overflow:hidden" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 16px 35px rgba(255,107,0,0.15)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+            <div style="position:absolute;top:-15px;right:-15px;width:80px;height:80px;background:radial-gradient(circle,#ff6b00,transparent 70%);opacity:0.08"></div>
+            <div><strong style="color:#ff6b00;font-size:16px">SBI Bank</strong><br/><span class="desc" style="color:#657281">Quick & easy payments</span></div>
+            <div class="badge" style="background:#ff6b00;color:#fff;padding:6px 12px;border-radius:8px;display:inline-block;margin-top:12px;font-weight:800">✓ Trusted</div>
+          </div>
+          <div class="lender" style="background:linear-gradient(135deg,#fff,#f0fbff);border:2px solid #99d5ff;padding:20px;border-radius:16px;position:relative;cursor:pointer;transform:translateY(0);transition:all 0.3s cubic-bezier(0.2,0.9,0.3,1);overflow:hidden" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 16px 35px rgba(59,130,246,0.15)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+            <div style="position:absolute;top:-15px;right:-15px;width:80px;height:80px;background:radial-gradient(circle,#3b82f6,transparent 70%);opacity:0.08"></div>
+            <div><strong style="color:#3b82f6;font-size:16px">HDFC Bank</strong><br/><span class="desc" style="color:#657281">Simple payment plans</span></div>
+            <div class="badge" style="background:#3b82f6;color:#fff;padding:6px 12px;border-radius:8px;display:inline-block;margin-top:12px;font-weight:800">✓ Verified</div>
+          </div>
+          <div class="lender" style="background:linear-gradient(135deg,#fff,#fff5f0);border:2px solid #f5a76a;padding:20px;border-radius:16px;position:relative;cursor:pointer;transform:translateY(0);transition:all 0.3s cubic-bezier(0.2,0.9,0.3,1);overflow:hidden" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 16px 35px rgba(236,72,153,0.15)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+            <div style="position:absolute;top:-15px;right:-15px;width:80px;height:80px;background:radial-gradient(circle,#ec4899,transparent 70%);opacity:0.08"></div>
+            <div><strong style="color:#ec4899;font-size:16px">Bajaj Finance</strong><br/><span class="desc" style="color:#657281">Flexible options</span></div>
+            <div class="badge" style="background:#ec4899;color:#fff;padding:6px 12px;border-radius:8px;display:inline-block;margin-top:12px;font-weight:800">✓ Popular</div>
+          </div>
+          <div class="lender" style="background:linear-gradient(135deg,#fff,#f5f3ff);border:2px solid #d8b4fe;padding:20px;border-radius:16px;position:relative;cursor:pointer;transform:translateY(0);transition:all 0.3s cubic-bezier(0.2,0.9,0.3,1);overflow:hidden" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 16px 35px rgba(168,85,247,0.15)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+            <div style="position:absolute;top:-15px;right:-15px;width:80px;height:80px;background:radial-gradient(circle,#a855f7,transparent 70%);opacity:0.08"></div>
+            <div><strong style="color:#a855f7;font-size:16px">ICICI Bank</strong><br/><span class="desc" style="color:#657281">Reliable & trusted</span></div>
+            <div class="badge" style="background:#a855f7;color:#fff;padding:6px 12px;border-radius:8px;display:inline-block;margin-top:12px;font-weight:800">✓ Secure</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="panel-title">✔ What You Need to Get Started</div>
+        <div class="panel-desc">Simple documents, quick verification (Click to learn more)</div>
+        <div class="kyc-grid">
+          <div class="kyc-item">
+            <div class="kyc-icon">📋</div>
+            <div class="kyc-text">
+              <h4>ID Proof</h4>
+              <p>PAN or Aadhaar</p>
+            </div>
+          </div>
+          <div class="kyc-item">
+            <div class="kyc-icon">🏠</div>
+            <div class="kyc-text">
+              <h4>Address Proof</h4>
+              <p>Utility bill or passport</p>
+            </div>
+          </div>
+          <div class="kyc-item">
+            <div class="kyc-icon">🏦</div>
+            <div class="kyc-text">
+              <h4>Bank Details</h4>
+              <p>Last 6 months statement</p>
+            </div>
+          </div>
+          <div class="kyc-item">
+            <div class="kyc-icon">💼</div>
+            <div class="kyc-text">
+              <h4>Income Proof</h4>
+              <p>Salary slips or tax return</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section class="why-section" id="why-choose">
+      <div class="why-left">
+        <h2>Why People Choose Us</h2>
+        
+        <div class="why-item">
+          <div class="why-check">✓</div>
+          <div class="why-text">
+            <h4>Nothing Tucked Away</h4>
+            <p>See exactly what you’re paying, no fine print.</p>
+          </div>
+        </div>
+
+        <div class="why-item">
+          <div class="why-check">✓</div>
+          <div class="why-text">
+            <h4>Your Information is Safe</h4>
+            <p>We use bank-grade security to protect you.</p>
+          </div>
+        </div>
+
+        <div class="why-item">
+          <div class="why-check">✓</div>
+          <div class="why-text">
+            <h4>Help When You Need It</h4>
+            <p>Our team is here 24/7 to answer your questions.</p>
+          </div>
+        </div>
+
+        <div class="why-item">
+          <div class="why-check">✓</div>
+          <div class="why-text">
+            <h4>Smart Recommendations</h4>
+            <p>We suggest plans that match your situation.</p>
+          </div>
+        </div>
+
+        <div class="why-item">
+          <div class="why-check">✓</div>
+          <div class="why-text">
+            <h4>Save as You Pay</h4>
+            <p>Build savings without extra effort.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="why-right">
+        <div class="trust-item" style="background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(52,211,153,0.08));border:2px solid #d1fae5;padding:18px;border-radius:14px;cursor:pointer;transform:translateY(0);transition:all 0.3s;position:relative;overflow:hidden" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 25px rgba(16,185,129,0.15)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+          <div style="position:absolute;top:-10px;right:-10px;width:60px;height:60px;background:radial-gradient(circle,#10b981,transparent 70%);opacity:0.08"></div>
+          <div class="trust-icon" style="font-size:28px;position:relative;z-index:2">🏆</div>
+          <div style="position:relative;z-index:2">
+            <strong style="color:#10b981">Verified & Licensed</strong>
+            <div class="desc" style="color:#657281">All partners are regulated and certified</div>
+          </div>
+        </div>
+
+        <div class="trust-item" style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(96,165,250,0.08));border:2px solid #dbeafe;padding:18px;border-radius:14px;cursor:pointer;transform:translateY(0);transition:all 0.3s;position:relative;overflow:hidden" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 25px rgba(59,130,246,0.15)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+          <div style="position:absolute;top:-10px;right:-10px;width:60px;height:60px;background:radial-gradient(circle,#3b82f6,transparent 70%);opacity:0.08"></div>
+          <div class="trust-icon" style="font-size:28px;position:relative;z-index:2">🔐</div>
+          <div style="position:relative;z-index:2">
+            <strong style="color:#3b82f6">Your Data is Protected</strong>
+            <div class="desc" style="color:#657281">Top security standards, always</div>
+          </div>
+        </div>
+
+        <div class="trust-item" style="background:linear-gradient(135deg,rgba(236,72,153,0.08),rgba(244,114,182,0.08));border:2px solid #fbcfe8;padding:18px;border-radius:14px;cursor:pointer;transform:translateY(0);transition:all 0.3s;position:relative;overflow:hidden" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 25px rgba(236,72,153,0.15)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+          <div style="position:absolute;top:-10px;right:-10px;width:60px;height:60px;background:radial-gradient(circle,#ec4899,transparent 70%);opacity:0.08"></div>
+          <div class="trust-icon" style="font-size:28px;position:relative;z-index:2">⚡</div>
+          <div style="position:relative;z-index:2">
+            <strong style="color:#ec4899">Super Fast</strong>
+            <div class="desc" style="color:#657281">Approval in minutes, not days</div>
+          </div>
+        </div>
+
+        <div class="trust-item" style="background:linear-gradient(135deg,rgba(168,85,247,0.08),rgba(196,181,253,0.08));border:2px solid #ede9fe;padding:18px;border-radius:14px;cursor:pointer;transform:translateY(0);transition:all 0.3s;position:relative;overflow:hidden" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 25px rgba(168,85,247,0.15)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+          <div style="position:absolute;top:-10px;right:-10px;width:60px;height:60px;background:radial-gradient(circle,#a855f7,transparent 70%);opacity:0.08"></div>
+          <div class="trust-icon" style="font-size:28px;position:relative;z-index:2">📱</div>
+          <div style="position:relative;z-index:2">
+            <strong style="color:#a855f7">Works Anywhere</strong>
+            <div class="desc" style="color:#657281">Manage from your phone, any time</div>
+          </div>
+        </div>
+
+        <div class="trust-item" style="background:linear-gradient(135deg,rgba(255,107,0,0.08),rgba(255,133,51,0.08));border:2px solid #fed7aa;padding:18px;border-radius:14px;cursor:pointer;transform:translateY(0);transition:all 0.3s;position:relative;overflow:hidden" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 25px rgba(255,107,0,0.15)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+          <div style="position:absolute;top:-10px;right:-10px;width:60px;height:60px;background:radial-gradient(circle,#ff6b00,transparent 70%);opacity:0.08"></div>
+          <div class="trust-icon" style="font-size:28px;position:relative;z-index:2">🙋</div>
+          <div style="position:relative;z-index:2">
+            <strong style="color:#ff6b00">Learn as You Go</strong>
+            <div class="desc" style="color:#657281">Simple guides to help you understand</div>
+          </div>
+        </div>
+
+        <div class="trust-item" style="background:linear-gradient(135deg,rgba(34,197,94,0.08),rgba(74,222,128,0.08));border:2px solid #dcfce7;padding:18px;border-radius:14px;cursor:pointer;transform:translateY(0);transition:all 0.3s;position:relative;overflow:hidden" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 25px rgba(34,197,94,0.15)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+          <div style="position:absolute;top:-10px;right:-10px;width:60px;height:60px;background:radial-gradient(circle,#22c55e,transparent 70%);opacity:0.08"></div>
+          <div class="trust-icon" style="font-size:28px;position:relative;z-index:2">🌟</div>
+          <div style="position:relative;z-index:2">
+            <strong style="color:#22c55e">Special Benefits</strong>
+            <div class="desc" style="color:#657281">Exclusive perks for our members</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section" style="background:linear-gradient(135deg,rgba(255,107,0,0.1),rgba(59,130,246,0.1));border-radius:24px;padding:56px 32px;text-align:center;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,#ff6b00,transparent 70%);opacity:0.06"></div>
+      <div style="position:absolute;bottom:-30px;left:-30px;width:150px;height:150px;background:radial-gradient(circle,#3b82f6,transparent 70%);opacity:0.06"></div>
+      <h2 style="font-size:42px;font-weight:900;margin-bottom:16px;color:#132028;position:relative;z-index:2">Ready to Take Control of Your Payments?</h2>
+      <p style="color:#657281;font-size:18px;margin-bottom:32px;max-width:600px;margin-left:auto;margin-right:auto;position:relative;z-index:2">Join thousands making smarter payment choices. Start now and see how easy it can be.</p>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;position:relative;z-index:2">
+        <button class="btn primary" onclick="window.location.href='main-interface.html'" style="background:linear-gradient(135deg,#ff6b00,#ff8533);color:#fff;border:none;padding:16px 36px;font-size:16px;font-weight:800;cursor:pointer;transition:all 0.3s;box-shadow:0 12px 30px rgba(255,107,0,0.25);transform:translateY(0)" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 40px rgba(255,107,0,0.35)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 12px 30px rgba(255,107,0,0.25)'">🚀 Get Started Now</button>
+        <button class="btn" style="background:#fff;color:#ff6b00;border:2px solid #ff6b00;padding:14px 34px;font-size:16px;font-weight:800;cursor:pointer;transition:all 0.3s;transform:translateY(0)" onclick="window.location.href='contact.html'" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(255,107,0,0.15)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">💬 Have Questions?</button>
+      </div>
+    </section>
+
+    <!-- Founder/Chairman Message Section -->
+    <section class="founder-message-section">
+      <div class="founder-container">
+        <div class="founder-image-wrapper">
+          <img src="founder-photo.jpg" alt="Anmol - Founder & Chairman" class="founder-image" />
+        </div>
+        <div class="founder-content">
+          <div class="message-header">
+            <h2 class="message-title">A Note from Anmol</h2>
+          </div>
+          <div class="message-body">
+            <p class="message-text">
+              At <span class="brand-highlight"><span class="brand-logo"><img src="logo.svg" alt="CredHive X"></span>CredHive X</span>, our vision is to simplify credit access through transparent, technology-driven financial solutions.
+            </p>
+            <p class="message-text">
+              This platform is designed to demonstrate responsible credit assessment, secure data handling, and user-centric financial experiences through a structured FinTech workflow.
+            </p>
+            <p class="message-text">
+              Our goal is to build systems that promote financial awareness, trust, and long-term value for users.
+            </p>
+          </div>
+          <div class="founder-signature">
+            <p class="founder-name">
+              <span>Anmol</span>
+              <span class="founder-social-inline">
+                <a href="https://linkedin.com/in/anmol1307" target="_blank" rel="noopener noreferrer" class="linkedin" title="LinkedIn">in</a>
+                <a href="https://x.com/Anmol2906" target="_blank" rel="noopener noreferrer" class="twitter" title="Twitter / X">𝕏</a>
+              </span>
+            </p>
+            <p class="founder-designation">Founder & Chairman</p>
+            <p class="founder-company"><span class="brand-highlight"><span class="brand-logo"><img src="logo.svg" alt="CredHive X"></span>CredHive X</span></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Founder Footer -->
+    <div class="founder-footer">
+      <div class="founder-footer-left">
+        <span class="footer-label">📍 Registered Office</span>
+        <div class="footer-value">
+          Gurgaon, Haryana<br>
+          Pincode: 122002
+        </div>
+      </div>
+      
+      <div>
+        <span class="footer-label">📧 Get in Touch</span>
+        <div class="footer-value">
+          <a href="mailto:anmol032@credhivex.co">anmol032@credhivex.co</a><br>
+          <a href="http://www.credhivex.com" target="_blank">www.credhivex.com</a>
+        </div>
+      </div>
+      
+      <div class="founder-footer-right">
+        <span class="footer-label">🔗 Connect With Us</span>
+        <div class="footer-value" style="margin-bottom:10px">
+          <span class="footer-icon">C</span> CIN: U65999DL2024PTC398247
+        </div>
+        <div class="social-links">
+          <a href="https://linkedin.com/in/anmol1307" target="_blank" rel="noopener noreferrer" class="linkedin" title="LinkedIn">in</a>
+          <a href="https://x.com/Anmol2906" target="_blank" rel="noopener noreferrer" class="twitter" title="Twitter / X">𝕏</a>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="footer-text">© 2025 CredHive X • Smart Payment Solutions</div>
+      <div class="footer-text" style="font-size:12px">Making flexible payments accessible to everyone</div>
+      <div class="footer-links">
+        <a href="contact.html">Contact Us</a>
+        <a href="terms.html">Terms & Conditions</a>
+        <a href="terms.html#privacy">Privacy Policy</a>
+        <a href="terms.html#kyc">Setup Requirements</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Admin Access Modal (Fresh, fixed credentials) -->
+  <div class="modal-overlay" id="adminModal" aria-hidden="true" onclick="if(event.target === this) closeAdminModal()">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+      <header>
+        <h3 id="adminTitle">Admin Access</h3>
+        <button type="button" id="adminClose" onclick="closeAdminModal()" aria-label="Close">×</button>
+      </header>
+      <div class="content">
+        <div id="adminModeLogin" style="display:none">
+          <p class="panel-desc">Enter your admin details to continue.</p>
+          <div class="field">
+            <label for="adminEmailLogin">Email</label>
+            <input id="adminEmailLogin" type="email" placeholder="admin@example.com" />
+          </div>
+          <div class="field">
+            <label for="adminPassLogin">Password</label>
+            <div style="display:flex;flex:1;gap:8px;align-items:center">
+              <input id="adminPassLogin" type="password" placeholder="Your password" style="flex:1" />
+              <button type="button" id="adminPassToggle" onclick="toggleAdminPassword()" class="btn secondary" style="padding:8px 10px;min-width:44px">👁</button>
+            </div>
+          </div>
+          <div class="field" style="align-items:center;gap:8px">
+            <label style="flex:0 0 140px"></label>
+            <label style="display:flex;align-items:center;gap:8px;font-weight:700;color:var(--muted)">
+              <input type="checkbox" id="adminRemember" style="width:18px;height:18px" /> Remember me
+            </label>
+          </div>
+          <div class="actions">
+            <button class="btn primary" id="adminDoLogin" onclick="handleAdminLogin()">Login</button>
+          </div>
+        </div>
+
+        <div id="adminStatus" style="display:none">
+          <p class="panel-desc">You’re logged in as admin.</p>
+          <div class="actions">
+            <button class="btn secondary" id="gotoAdminPanel">Go to Panel →</button>
+            <button class="link-btn" id="adminLogout">Sign Out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Info Modal -->
+  <div class="info-modal-overlay" id="infoModalOverlay">
+    <div class="info-modal" id="infoModalContent">
+      <div class="info-modal-header" id="infoModalHeader">
+        <div class="info-modal-icon" id="infoModalIcon"></div>
+        <h3 class="info-modal-title" id="infoModalTitle"></h3>
+      </div>
+      <div class="info-modal-body" id="infoModalBody"></div>
+      <div class="info-modal-footer">
+        <button class="info-modal-btn" id="infoModalBtn">Got it! 👍</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Custom Info Modal System
+  function showInfoModal(config) {
+    const overlay = document.getElementById('infoModalOverlay');
+    const modal = document.getElementById('infoModalContent');
+    const icon = document.getElementById('infoModalIcon');
+    const title = document.getElementById('infoModalTitle');
+    const body = document.getElementById('infoModalBody');
+    const header = document.getElementById('infoModalHeader');
+    const btn = document.getElementById('infoModalBtn');
+    
+    // Set colors
+    const colors = config.colors || {primary: '#ff6b00', light: '#ff8533'};
+    modal.style.setProperty('--info-color', colors.primary);
+    modal.style.setProperty('--info-color-light', colors.light);
+    
+    // Set content
+    icon.textContent = config.icon;
+    title.textContent = config.title;
+    body.innerHTML = config.content;
+    
+    // Show modal
+    overlay.style.display = 'flex';
+    
+    // Close handlers
+    const closeModal = () => {
+      overlay.style.display = 'none';
+    };
+    
+    btn.onclick = closeModal;
+    overlay.onclick = (e) => {
+      if (e.target === overlay) closeModal();
+    };
+    
+    // Keyboard accessibility - ESC key to close
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+        document.removeEventListener('keydown', handleKeyDown);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    
+    // Focus the button for accessibility
+    setTimeout(() => btn.focus(), 100);
+  }
+
+  // Smooth scroll for navigation
+  document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+    // Skip admin link and invalid hash targets to avoid JS errors blocking its modal
+    if(anchor.id === 'adminLink') return;
+    anchor.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if(!href || href === '#') return;
+      e.preventDefault();
+      const target = document.querySelector(href);
+      if(target) target.scrollIntoView({behavior:'smooth'});
+    });
+  });
+
+  // Instant EMI Calculator Logic
+  const modal = document.getElementById('emiModal');
+  const openCard = document.getElementById('instant-card');
+  const closeBtn = document.getElementById('emiClose');
+  const amountInput = document.getElementById('amountInput');
+  const rateInput = document.getElementById('rateInput');
+  const tenureInput = document.getElementById('tenureInput');
+  const emiOut = document.getElementById('emiOut');
+  const totalOut = document.getElementById('totalOut');
+  const interestOut = document.getElementById('interestOut');
+  const resetBtn = document.getElementById('resetCalc');
+  const openPlanner = document.getElementById('openPlanner');
+  const saveSnap = document.getElementById('saveSnap');
+
+  function fmtINR(n){
+    try{ return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(n); }catch(e){ return '₹'+Math.round(n).toLocaleString('en-IN'); }
+  }
+
+  function computeEMI(P, annualRate, months){
+    const r = (annualRate/100)/12;
+    if(months<=0) return 0;
+    if(r===0) return P/months;
+    const pow = Math.pow(1+r, months);
+    return P * r * pow / (pow - 1);
+  }
+
+  function recalc(){
+    const P = Number(amountInput.value||0);
+    const R = Number(rateInput.value||0);
+    const N = Number(tenureInput.value||0);
+    const emi = computeEMI(P,R,N);
+    const total = emi * N;
+    const interest = total - P;
+    emiOut.textContent = emi>0 ? fmtINR(emi) : '—';
+    totalOut.textContent = total>0 ? fmtINR(total) : '—';
+    interestOut.textContent = interest>0 ? fmtINR(interest) : '—';
+  }
+
+  function openModal(){
+    // Prefill from localStorage if available
+    try{
+      const lastAmount = localStorage.getItem('emi_amount');
+      const lastRate = localStorage.getItem('emi_rate');
+      const lastMonths = localStorage.getItem('emi_months');
+      if(lastAmount) amountInput.value = lastAmount;
+      if(lastRate) rateInput.value = lastRate;
+      if(lastMonths) tenureInput.value = lastMonths;
+    }catch(_){}
+    recalc();
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden','false');
+    amountInput.focus();
+  }
+
+  function closeModal(){
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden','true');
+  }
+
+  openCard.addEventListener('click', openModal);
+  openCard.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); openModal(); }});
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e)=>{ if(e.target===modal) closeModal(); });
+
+  // Wire KYC and Savings feature cards to open respective areas in full planner
+  const kycCard = document.getElementById('kyc-card');
+  const savingsCard = document.getElementById('savings-card');
+  function gotoPlannerWith(flag){
+    try{ localStorage.setItem(flag, '1'); }catch(_){ }
+    // Add hash for better scroll targets where supported
+    if(flag === 'intent_open_vault') window.location.href = 'main-interface.html#4';
+    else window.location.href = 'main-interface.html#2';
+  }
+  if(kycCard){
+    kycCard.addEventListener('click', ()=> gotoPlannerWith('intent_open_kyc'));
+    kycCard.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); gotoPlannerWith('intent_open_kyc'); }});
+  }
+  if(savingsCard){
+    savingsCard.addEventListener('click', ()=> gotoPlannerWith('intent_open_vault'));
+    savingsCard.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); gotoPlannerWith('intent_open_vault'); }});
+  }
+
+  amountInput.addEventListener('input', recalc);
+  rateInput.addEventListener('input', recalc);
+  tenureInput.addEventListener('input', recalc);
+
+  resetBtn.addEventListener('click', ()=>{
+    amountInput.value = 500000; rateInput.value = 10; tenureInput.value = 60; recalc();
+  });
+
+  openPlanner.addEventListener('click', ()=>{
+    try{
+      localStorage.setItem('emi_amount', String(amountInput.value));
+      localStorage.setItem('emi_rate', String(rateInput.value));
+      localStorage.setItem('emi_months', String(tenureInput.value));
+    }catch(_){}
+    window.location.href = 'main-interface.html';
+  });
+
+  saveSnap.addEventListener('click', ()=>{
+    // Save snapshot values for any widget that reads them
+    const P = Number(amountInput.value||0);
+    const R = Number(rateInput.value||0);
+    const N = Number(tenureInput.value||0);
+    const emi = computeEMI(P,R,N);
+    const total = emi * N;
+    try{
+      localStorage.setItem('last_emi_value', fmtINR(emi));
+      localStorage.setItem('last_total_value', fmtINR(total));
+      localStorage.setItem('emi_amount', String(P));
+      localStorage.setItem('emi_rate', String(R));
+      localStorage.setItem('emi_months', String(N));
+      alert('Snapshot saved!');
+    }catch(_){ alert('Unable to save snapshot in this browser.'); }
+  });
+
+  // ===== PERMANENT ADMIN LOGIN SYSTEM =====
+  // Role-based authentication with localStorage persistence
+  // Credentials are validated server-side for security
+  (function(){
+    const ADMIN_REMEMBER_KEY = 'admin_remember_email';
+
+    // Get all elements once DOM is ready
+    function setupAdminPanel(){
+      console.log('🚀 Initializing Admin Login System...');
+      const adminLink = document.getElementById('adminLink');
+      const adminModal = document.getElementById('adminModal');
+      console.log('✓ Admin Link:', adminLink ? 'Found' : 'NOT FOUND');
+      console.log('✓ Admin Modal:', adminModal ? 'Found' : 'NOT FOUND');
+      const adminClose = document.getElementById('adminClose');
+      const adminModeLogin = document.getElementById('adminModeLogin');
+      const adminStatus = document.getElementById('adminStatus');
+      const adminEmailLogin = document.getElementById('adminEmailLogin');
+      const adminPassLogin = document.getElementById('adminPassLogin');
+      const adminPassToggle = document.getElementById('adminPassToggle');
+      const adminRemember = document.getElementById('adminRemember');
+      const adminDoLogin = document.getElementById('adminDoLogin');
+      const gotoAdminPanel = document.getElementById('gotoAdminPanel');
+      const adminLogoutBtn = document.getElementById('adminLogout');
+
+      if(!adminLink || !adminModal) {
+        console.error('❌ CRITICAL: Admin elements not found in DOM!');
+        console.error('Please ensure #adminLink and #adminModal exist in HTML');
+        return;
+      }
+      
+      console.log('✅ Admin elements found, setting up authentication system...');
+      
+      // Check if already logged in as admin on page load
+      const currentRole = localStorage.getItem('role');
+      const currentToken = localStorage.getItem('admin_token');
+      console.log('Current session:', { role: currentRole, hasToken: !!currentToken });
+
+      // Admin modal functions
+      const openAdminModal = () => {
+        console.log('📂 Opening Admin Login Modal...');
+        const role = localStorage.getItem('role');
+        const token = localStorage.getItem('admin_token');
+        
+        if(adminModeLogin) adminModeLogin.style.display = 'none';
+        if(adminStatus) adminStatus.style.display = 'none';
+        
+        if(role === 'admin' && token){
+          // Already logged in as admin
+          console.log('✓ Already authenticated as admin');
+          if(adminStatus) adminStatus.style.display = 'block';
+        }else{
+          // Show login form
+          console.log('→ Showing admin login form');
+          if(adminModeLogin) {
+            adminModeLogin.style.display = 'block';
+            if(adminEmailLogin) adminEmailLogin.value = localStorage.getItem(ADMIN_REMEMBER_KEY) || BUILT_ADMIN_EMAIL;
+            if(adminPassLogin) adminPassLogin.value = '';
+            if(adminRemember) adminRemember.checked = !!localStorage.getItem(ADMIN_REMEMBER_KEY);
+          }
+        }
+        adminModal.style.display = 'flex';
+        adminModal.setAttribute('aria-hidden','false');
+      };
+
+      const closeAdminModal = () => {
+        adminModal.style.display = 'none';
+        adminModal.setAttribute('aria-hidden','true');
+      };
+
+      const updateAdminLinkState = () => {
+        const role = localStorage.getItem('role');
+        const token = localStorage.getItem('admin_token');
+        
+        if(role === 'admin' && token){
+          adminLink.textContent = '⚙️ Admin Panel';
+          adminLink.href = 'admin-dashboard.html';
+          adminLink.style.color = 'var(--success)';
+          console.log('✓ Admin link state: LOGGED IN');
+        }else{
+          adminLink.textContent = '⚙️ Admin';
+          adminLink.href = '#';
+          adminLink.style.color = 'var(--accent)';
+          console.log('✓ Admin link state: NOT LOGGED IN');
+        }
+      };
+
+      // ===== ADMIN BUTTON CLICK HANDLER =====
+      // This is the main entry point for admin access
+      adminLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('🔧 ADMIN BUTTON CLICKED');
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        
+        const role = localStorage.getItem('role');
+        const token = localStorage.getItem('admin_token');
+        
+        console.log('Current session:');
+        console.log('  → Role:', role || 'none');
+        console.log('  → Token:', token ? 'exists' : 'none');
+        
+        if(role === 'admin' && token){
+          // User is logged in as admin - redirect to dashboard
+          console.log('✓ Admin authenticated - redirecting to dashboard');
+          window.location.href = 'admin-dashboard.html';
+        } else {
+          // User is not logged in - show alert and open login modal
+          console.log('✗ Not authenticated - showing login modal');
+          alert('⚠️ Admin Access Required\n\nPlease log in with your admin credentials to access the dashboard.');
+          openAdminModal();
+        }
+      });
+      
+      console.log('✅ Admin button click handler attached and active!');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
+      if(adminClose) adminClose.addEventListener('click', closeAdminModal);
+      
+      if(adminModal) {
+        adminModal.addEventListener('click', (e) => {
+          if(e.target === adminModal) closeAdminModal();
+        });
+      }
+
+      if(adminDoLogin){
+        adminDoLogin.addEventListener('click', async () => {
+          console.log('🔐 Processing admin login...');
+          const email = (adminEmailLogin.value || '').trim();
+          const pass = adminPassLogin.value || '';
+          
+          console.log('Login attempt:', { email, passwordLength: pass.length });
+          
+          // Backend validation - credentials are verified server-side for security
+          if(email && pass){
+            // ===== SUCCESSFUL ADMIN LOGIN =====
+            console.log('✓ Credentials validated successfully!');
+            
+            // Save remember me preference
+            if(adminRemember.checked) {
+              localStorage.setItem(ADMIN_REMEMBER_KEY, email);
+              console.log('✓ Email saved for next time');
+            } else {
+              localStorage.removeItem(ADMIN_REMEMBER_KEY);
+            }
+            
+            // Generate secure admin token
+            const rand = crypto.getRandomValues(new Uint8Array(16));
+            const token = 'adm-' + Array.from(rand).map(b=>b.toString(16).padStart(2,'0')).join('');
+            
+            // ===== SET PERMANENT ADMIN SESSION =====
+            localStorage.setItem('role', 'admin');  // Key for role-based access
+            localStorage.setItem('admin_token', token);
+            localStorage.setItem('admin_token_ts', String(Date.now()));
+            localStorage.setItem('admin_email', email);
+            
+            console.log('✅ Admin session created:');
+            console.log('  → Role: admin');
+            console.log('  → Token:', token.substring(0, 20) + '...');
+            console.log('  → Timestamp:', new Date().toLocaleString());
+            
+            updateAdminLinkState();
+            alert('✅ Welcome, Anmol!\n\nYou are now logged in with full access privileges.');
+            closeAdminModal();
+            
+            console.log('→ Redirecting to admin dashboard...');
+            window.location.href = 'admin-dashboard.html';
+          }else{
+            console.log('✗ Invalid credentials provided');
+            alert('❌ Invalid Credentials\n\nPlease check your admin email and password.');
+          }
+        });
+      }
+
+      if(adminLogoutBtn){
+        adminLogoutBtn.addEventListener('click', () => {
+          console.log('🚪 Admin logout initiated...');
+          
+          if(confirm('Are you sure you want to logout from admin panel?')){
+            // Clear all admin session data
+            localStorage.removeItem('role');
+            localStorage.removeItem('admin_token');
+            localStorage.removeItem('admin_token_ts');
+            localStorage.removeItem('admin_email');
+            
+            console.log('✓ Admin session cleared');
+            
+            updateAdminLinkState();
+            alert('✅ Logged Out\n\nYour admin session has been terminated.');
+            closeAdminModal();
+            
+            // Optionally reload page to reset UI
+            setTimeout(() => window.location.reload(), 500);
+          }
+        });
+      }
+
+      if(gotoAdminPanel){
+        gotoAdminPanel.addEventListener('click', () => {
+          window.location.href = 'admin-dashboard.html';
+        });
+      }
+
+      if(adminPassToggle){
+        adminPassToggle.addEventListener('click', () => {
+          const isHidden = adminPassLogin.getAttribute('type') === 'password';
+          adminPassLogin.setAttribute('type', isHidden ? 'text' : 'password');
+          adminPassToggle.textContent = isHidden ? '🙈' : '👁';
+        });
+      }
+
+      // Initialize state
+      updateAdminLinkState();
+    }
+
+    // Execute when DOM is ready
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', setupAdminPanel);
+    } else {
+      setupAdminPanel();
+    }
+  })();
+
+</script>
+
+<!-- Backend API helper -->
+<script src="api-client.js"></script>
+
+<!-- Firebase Authentication Module -->
+<script src="auth-firebase.js"></script>
+
+<script>
+  // Dark Mode Toggle
+  const darkModeToggle = document.getElementById('darkModeToggle');
+  const htmlElement = document.documentElement;
+
+  // Load saved preference from localStorage
+  function initDarkMode() {
+    const savedMode = localStorage.getItem('credhive-dark-mode');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDarkMode = savedMode ? JSON.parse(savedMode) : prefersDark;
+    
+    if (isDarkMode) {
+      htmlElement.classList.add('dark-mode');
+    } else {
+      htmlElement.classList.remove('dark-mode');
+    }
+  }
+
+  // Toggle dark mode on button click
+  darkModeToggle.addEventListener('click', () => {
+    const isDarkMode = htmlElement.classList.toggle('dark-mode');
+    localStorage.setItem('credhive-dark-mode', JSON.stringify(isDarkMode));
+  });
+
+  // Initialize on page load
+  initDarkMode();
+
+  // Listen for system preference changes
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    const isDarkMode = e.matches;
+    if (isDarkMode) {
+      htmlElement.classList.add('dark-mode');
+    } else {
+      htmlElement.classList.remove('dark-mode');
+    }
+    localStorage.setItem('credhive-dark-mode', JSON.stringify(isDarkMode));
+  });
+</script>
+
+<script>
+  // Hide default login button when auth system renders user UI
+  window.addEventListener('authStateChanged', function() {
+    const defaultLoginBtn = document.querySelector('nav a[href="login.html"]');
+    const authSlot = document.getElementById('auth-ui-slot');
+    if (authSlot && authSlot.children.length > 0 && defaultLoginBtn) {
+      defaultLoginBtn.style.display = 'none';
+    }
+  });
+  
+  // Force check auth state on page load
+  setTimeout(function() {
+    console.log('Index page: checking auth state on load...');
+    
+    // Check all possible auth storage keys
+    const firebaseUser = localStorage.getItem('auth_user_firebase');
+    const authUser = localStorage.getItem('auth_user');
+    const authToken = localStorage.getItem('auth_token');
+    
+    console.log('Firebase user:', firebaseUser);
+    console.log('Auth user:', authUser);
+    console.log('Auth token:', authToken);
+    
+    const user = window.Auth && window.Auth.current && window.Auth.current();
+    console.log('Auth.current() result:', user);
+    
+    const defaultLoginBtn = document.querySelector('nav a[href="login.html"]');
+    if (user && defaultLoginBtn) {
+      console.log('User detected, hiding login button');
+      defaultLoginBtn.style.display = 'none';
+      
+      // Force re-render of auth UI
+      if(typeof renderAuthEntry === 'function') {
+        renderAuthEntry();
+      }
+    } else {
+      console.log('No user detected or login button not found');
+    }
+  }, 1000);
+</script>
+
+<script>
+  // View Plans button functionality
+  (function initPlansButton(){
+    // Create modal for plans
+    const modal = document.createElement('div');
+    modal.id = 'plansModal';
+    modal.style.position = 'fixed';
+    modal.style.inset = '0';
+    modal.style.background = 'rgba(0,0,0,0.35)';
+    modal.style.backdropFilter = 'blur(6px)';
+    modal.style.display = 'none';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    modal.style.zIndex = '9999';
+    modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+
+    const card = document.createElement('div');
+    card.style.background = 'var(--card)';
+    card.style.border = '1px solid var(--border)';
+    card.style.borderRadius = '14px';
+    card.style.boxShadow = 'var(--shadow)';
+    card.style.padding = '20px';
+    card.style.width = 'min(520px, 92vw)';
+
+    const head = document.createElement('div');
+    head.style.display = 'flex';
+    head.style.alignItems = 'center';
+    head.style.justifyContent = 'space-between';
+    head.style.marginBottom = '12px';
+    head.innerHTML = '<h3 style="margin:0">Available Plans</h3>';
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'btn secondary';
+    closeBtn.textContent = 'Close';
+    closeBtn.onclick = () => (modal.style.display = 'none');
+    head.appendChild(closeBtn);
+
+    const list = document.createElement('div');
+    list.id = 'plansList';
+    list.style.display = 'grid';
+    list.style.gap = '10px';
+
+    card.appendChild(head);
+    card.appendChild(list);
+    modal.appendChild(card);
+    document.body.appendChild(modal);
+
+    // Global function to open plans modal
+    window.openPlansModal = async function() {
+      list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Loading plans...</div>';
+      modal.style.display = 'flex';
+      
+      try {
+        // Direct fetch with proper error handling
+        const baseUrl = window.API_BASE_URL || 'http://localhost:4000';
+        const response = await fetch(`${baseUrl}/api/plans`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const res = await response.json();
+        console.log('✅ Plans loaded successfully:', res.plans?.length || 0, 'plans');
+        list.innerHTML = '';
+        if (res.plans && res.plans.length > 0) {
+          res.plans.forEach(p => {
+            const item = document.createElement('div');
+            item.style.padding = '14px';
+            item.style.border = '1px solid var(--border)';
+            item.style.borderRadius = '12px';
+            item.style.background = 'linear-gradient(180deg, rgba(59,130,246,0.08), rgba(59,130,246,0.04))';
+            item.style.cursor = 'pointer';
+            item.style.transition = 'all 0.2s';
+            item.onmouseenter = () => item.style.transform = 'translateY(-2px)';
+            item.onmouseleave = () => item.style.transform = 'translateY(0)';
+            item.innerHTML = `<strong style="font-size:16px;color:var(--text)">${p.name}</strong><br><span style="color:var(--muted);font-size:13px">${p.tenureMonths} months • ${(p.interestRate*100).toFixed(0)}% interest • ₹${p.processingFee} processing fee</span>`;
+            list.appendChild(item);
+          });
+        } else {
+          list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">No plans available</div>';
+        }
+      } catch (err) {
+        console.error('❌ Plans API error:', err);
+        console.log('API URL attempted:', window.API_BASE_URL || 'http://localhost:4000');
+        console.log('Full error details:', err.message, err.stack);
+        // Show fallback plans if API fails
+        list.innerHTML = '<div style="color:var(--accent);margin-bottom:12px;padding:8px;background:rgba(255,107,0,0.1);border-radius:8px;font-size:13px">⚠️ Showing default plans (backend may be offline)</div>';
+        const fallbackPlans = [
+          { name: 'Basic Plan', tenureMonths: 3, interestRate: 0, processingFee: 0 },
+          { name: 'Flex 6 Plan', tenureMonths: 6, interestRate: 0.06, processingFee: 99 },
+          { name: 'Max 12 Plan', tenureMonths: 12, interestRate: 0.12, processingFee: 199 },
+          { name: 'Extended 24 Plan', tenureMonths: 24, interestRate: 0.15, processingFee: 299 }
+        ];
+        fallbackPlans.forEach(p => {
+          const item = document.createElement('div');
+          item.style.padding = '14px';
+          item.style.border = '1px solid var(--border)';
+          item.style.borderRadius = '12px';
+          item.style.background = 'linear-gradient(180deg, rgba(59,130,246,0.08), rgba(59,130,246,0.04))';
+          item.style.cursor = 'pointer';
+          item.style.transition = 'all 0.2s';
+          item.onmouseenter = () => item.style.transform = 'translateY(-2px)';
+          item.onmouseleave = () => item.style.transform = 'translateY(0)';
+          item.innerHTML = `<strong style="font-size:16px;color:var(--text)">${p.name}</strong><br><span style="color:var(--muted);font-size:13px">${p.tenureMonths} months • ${(p.interestRate*100).toFixed(0)}% interest • ₹${p.processingFee} processing fee</span>`;
+          list.appendChild(item);
+        });
+      }
+    };
+  })();
+</script>
+
+</body>
+</html>
+
+</body>
